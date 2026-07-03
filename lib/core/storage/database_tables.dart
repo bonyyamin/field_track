@@ -1,0 +1,1 @@
+// table/box schema definitions (TodosTable, PendingChangesTable, LocationsTable)

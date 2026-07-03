@@ -1,0 +1,1 @@
+// all endpoint path constants (auth, locations, todos)

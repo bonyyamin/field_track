@@ -1,0 +1,1 @@
+// MaterialApp.router setup, theme, global BlocProviders (Auth/Connectivity)

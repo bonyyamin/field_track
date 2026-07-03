@@ -1,0 +1,1 @@
+// storage keys, notification channel ids, geofence check interval

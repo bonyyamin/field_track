@@ -1,0 +1,1 @@
+ // Failure classes: ServerFailure, CacheFailure, NetworkFailure, AuthFailure

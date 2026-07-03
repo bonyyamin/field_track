@@ -1,0 +1,1 @@
+// short-circuits requests early when offline (fail fast to local queue)
