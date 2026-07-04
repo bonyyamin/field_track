@@ -48,6 +48,17 @@ class SecureStorageService {
     return token != null && token.isNotEmpty;
   }
 
+  // ── Sync Timestamp ────────────────────────────────────────────────────────
+
+  Future<void> saveLastSyncedAt(DateTime dateTime) =>
+      _storage.write(key: AppConstants.keyLastSyncTime, value: dateTime.toIso8601String());
+
+  Future<DateTime?> getLastSyncedAt() async {
+    final str = await _storage.read(key: AppConstants.keyLastSyncTime);
+    if (str == null || str.isEmpty) return null;
+    return DateTime.tryParse(str);
+  }
+
   /// Wipes all secured storage — call on logout.
   Future<void> clearAll() => _storage.deleteAll();
 }

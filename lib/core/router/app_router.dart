@@ -16,6 +16,9 @@ import 'route_names.dart';
 
 import 'package:field_tracker/features/todos/presentation/bloc/todo_bloc.dart';
 import 'package:field_tracker/features/todos/presentation/pages/todo_list_page.dart';
+import 'package:field_tracker/features/sync/presentation/bloc/sync_bloc.dart';
+import 'package:field_tracker/features/sync/presentation/bloc/sync_event.dart';
+import 'package:field_tracker/features/sync/presentation/pages/sync_page.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -71,8 +74,9 @@ final router = GoRouter(
         ),
         GoRoute(
           path: RouteNames.sync,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Sync Screen')),
+          builder: (context, state) => BlocProvider(
+            create: (_) => sl<SyncBloc>()..add(const LoadSyncStatus()),
+            child: const SyncPage(),
           ),
         ),
         GoRoute(

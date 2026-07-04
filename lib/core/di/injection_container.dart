@@ -35,6 +35,8 @@ import 'package:field_tracker/features/todos/domain/usecases/get_todos_usecase.d
 import 'package:field_tracker/features/todos/domain/usecases/sync_pending_todos_usecase.dart';
 import 'package:field_tracker/features/todos/domain/usecases/toggle_todo_usecase.dart';
 import 'package:field_tracker/features/todos/presentation/bloc/todo_bloc.dart';
+import 'package:field_tracker/features/sync/domain/usecases/get_sync_status_usecase.dart';
+import 'package:field_tracker/features/sync/presentation/bloc/sync_bloc.dart';
 import 'package:field_tracker/core/usecase/usecase.dart';
 
 /// Global Service Locator instance
@@ -209,6 +211,13 @@ Future<void> configureDependencies({LocalDatabase? localDatabase}) async {
   sl.registerLazySingleton(() => GetTodosUseCase(sl<TodoRepository>()));
   sl.registerLazySingleton(() => ToggleTodoUseCase(sl<TodoRepository>()));
   sl.registerLazySingleton(() => SyncPendingTodosUseCase(sl<TodoRepository>()));
+  sl.registerLazySingleton(
+    () => GetSyncStatusUseCase(
+      todoRepository: sl<TodoRepository>(),
+      secureStorage: sl<SecureStorageService>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
 
   // BLoC
   sl.registerFactory(
@@ -217,6 +226,16 @@ Future<void> configureDependencies({LocalDatabase? localDatabase}) async {
       toggleTodoUseCase: sl<ToggleTodoUseCase>(),
       syncPendingTodosUseCase: sl<SyncPendingTodosUseCase>(),
       networkInfo: sl<NetworkInfo>(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => SyncBloc(
+      getSyncStatusUseCase: sl<GetSyncStatusUseCase>(),
+      syncPendingTodosUseCase: sl<SyncPendingTodosUseCase>(),
+      networkInfo: sl<NetworkInfo>(),
+      secureStorage: sl<SecureStorageService>(),
+      localDatabase: sl<LocalDatabase>(),
     ),
   );
 }
