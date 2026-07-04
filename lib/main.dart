@@ -23,7 +23,11 @@ void main() async {
   await GoogleFonts.pendingFonts();
 
   // Load .env before anything reads dotenv.env
-  await dotenv.load(fileName: '.env');
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('Could not load .env file: $e');
+  }
 
   // Initialise local Hive database before DI (services depend on open boxes).
   final localDatabase = LocalDatabase();
