@@ -418,6 +418,8 @@ class _AddLocationPageState extends State<AddLocationPage> {
     required Color titleColor,
     required Color labelColor,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final errorColor = isDark ? AppColors.errorDark : AppColors.errorLight;
     return InputDecoration(
       hintText: hintText,
       hintStyle: AppTextStyles.bodyMedium.copyWith(color: labelColor),
@@ -430,15 +432,20 @@ class _AddLocationPageState extends State<AddLocationPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: AppColors.primaryLight, width: 1.5),
+        borderSide: BorderSide(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.primaryDark
+              : AppColors.primaryLight,
+          width: 1.5,
+        ),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: AppColors.errorLight, width: 1.0),
+        borderSide: BorderSide(color: errorColor, width: 1.0),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: AppColors.errorLight, width: 1.5),
+        borderSide: BorderSide(color: errorColor, width: 1.5),
       ),
     );
   }

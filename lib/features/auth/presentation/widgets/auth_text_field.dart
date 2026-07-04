@@ -11,7 +11,7 @@ import 'package:field_tracker/core/theme/app_text_styles.dart';
 class AuthTextField extends StatefulWidget {
   final String label;
   final String hint;
-  final IconData prefixIcon;
+  final dynamic prefixIcon; // Can be IconData or String (for asset image)
   final TextEditingController controller;
   final TextInputType keyboardType;
   final bool obscureText;
@@ -152,7 +152,17 @@ class _AuthTextFieldState extends State<AuthTextField> {
             },
             decoration: InputDecoration(
               hintText: widget.hint,
-              prefixIcon: Icon(widget.prefixIcon, size: 18, color: iconColor),
+              prefixIcon: widget.prefixIcon is IconData
+                  ? Icon(widget.prefixIcon as IconData, size: 18, color: iconColor)
+                  : Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Image.asset(
+                        widget.prefixIcon as String,
+                        width: 18,
+                        height: 18,
+                        color: iconColor,
+                      ),
+                    ),
               suffixIcon: widget.suffixIcon,
             ),
           ),

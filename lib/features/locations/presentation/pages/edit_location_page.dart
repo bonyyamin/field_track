@@ -105,7 +105,7 @@ class _EditLocationPageState extends State<EditLocationPage> {
                 context.read<LocationBloc>().add(DeleteLocation(widget.location.id));
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.errorLight,
+                backgroundColor: isDark ? AppColors.errorDark : AppColors.errorLight,
               ),
               child: const Text('Delete', style: TextStyle(color: Colors.white)),
             ),
@@ -390,6 +390,8 @@ class _EditLocationPageState extends State<EditLocationPage> {
     required Color borderColor,
     required Color labelColor,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final errorColor = isDark ? AppColors.errorDark : AppColors.errorLight;
     return InputDecoration(
       hintText: hintText,
       hintStyle: AppTextStyles.bodyMedium.copyWith(color: labelColor),
@@ -402,15 +404,20 @@ class _EditLocationPageState extends State<EditLocationPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: AppColors.primaryLight, width: 1.5),
+        borderSide: BorderSide(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.primaryDark
+              : AppColors.primaryLight,
+          width: 1.5,
+        ),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: AppColors.errorLight, width: 1.0),
+        borderSide: BorderSide(color: errorColor, width: 1.0),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: AppColors.errorLight, width: 1.5),
+        borderSide: BorderSide(color: errorColor, width: 1.5),
       ),
     );
   }

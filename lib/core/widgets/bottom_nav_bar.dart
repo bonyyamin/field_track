@@ -114,23 +114,23 @@ class BottomNavBar extends StatelessWidget {
         unselectedLabelStyle: AppTextStyles.navbar,
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset(AppIcon.tasksInactive, width: 24, height: 24),
-            activeIcon: Image.asset(AppIcon.tasksActive, width: 24, height: 24),
+            icon: Image.asset(AppIcon.tasksInactive, width: 24, height: 24, color: unselectedColor),
+            activeIcon: Image.asset(AppIcon.tasksActive, width: 24, height: 24, color: selectedColor),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(AppIcon.locationInactive, width: 24, height: 24),
-            activeIcon: Image.asset(AppIcon.locationActive, width: 24, height: 24),
+            icon: Image.asset(AppIcon.locationInactive, width: 24, height: 24, color: unselectedColor),
+            activeIcon: Image.asset(AppIcon.locationActive, width: 24, height: 24, color: selectedColor),
             label: 'Locations',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(AppIcon.syncInactive, width: 24, height: 24),
-            activeIcon: Image.asset(AppIcon.syncActive, width: 24, height: 24),
+            icon: Image.asset(AppIcon.syncInactive, width: 24, height: 24, color: unselectedColor),
+            activeIcon: Image.asset(AppIcon.syncActive, width: 24, height: 24, color: selectedColor),
             label: 'Sync',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(AppIcon.profileInactive, width: 24, height: 24),
-            activeIcon: Image.asset(AppIcon.profileActive, width: 24, height: 24),
+            icon: Image.asset(AppIcon.profileInactive, width: 24, height: 24, color: unselectedColor),
+            activeIcon: Image.asset(AppIcon.profileActive, width: 24, height: 24, color: selectedColor),
             label: 'Profile',
           ),
         ],

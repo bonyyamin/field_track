@@ -106,7 +106,7 @@ class _LocationsListPageState extends State<LocationsListPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.error_outline, size: 48, color: AppColors.errorLight),
+                            Icon(Icons.error_outline, size: 48, color: isDark ? AppColors.errorDark : AppColors.errorLight),
                             const SizedBox(height: 12),
                             Text(
                               state.message,
@@ -210,15 +210,28 @@ class _LocationsListPageState extends State<LocationsListPage> {
           ),
         ),
       ),
-      // Floating Action Button matching Screen 04 bottom right FAB
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToAddLocation,
-        backgroundColor: primaryColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-        child: Icon(
-          Icons.add,
-          color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
-          size: 28,
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withValues(alpha: 0.4),
+              blurRadius: 16,
+              spreadRadius: 2,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: _navigateToAddLocation,
+          backgroundColor: primaryColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          child: Icon(
+            Icons.add,
+            color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
+            size: 28,
+          ),
         ),
       ),
     );

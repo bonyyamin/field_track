@@ -7,6 +7,7 @@ import 'package:field_tracker/core/theme/app_text_styles.dart';
 import 'package:field_tracker/core/widgets/app_button.dart';
 import 'package:field_tracker/core/widgets/error_view.dart';
 import 'package:field_tracker/core/widgets/loading_indicator.dart';
+import 'package:field_tracker/core/constants/app_icon.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
@@ -182,7 +183,7 @@ class ProfilePage extends StatelessWidget {
                         child: Column(
                           children: [
                             ProfileMenuTile(
-                              icon: Icons.person_outline_rounded,
+                              icon: AppIcon.profileInactive,
                               label: 'Edit profile',
                               onTap: () {
                                 ScaffoldMessenger.of(context).showSnackBar(

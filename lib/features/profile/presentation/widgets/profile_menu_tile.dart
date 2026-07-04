@@ -4,7 +4,7 @@ import 'package:field_tracker/core/theme/app_text_styles.dart';
 
 /// Reusable profile menu tile item with leading icon, label, and trailing chevron.
 class ProfileMenuTile extends StatelessWidget {
-  final IconData icon;
+  final dynamic icon;
   final String label;
   final VoidCallback onTap;
   final bool showDivider;
@@ -45,11 +45,18 @@ class ProfileMenuTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(
-                    icon,
-                    size: 20,
-                    color: iconColor,
-                  ),
+                  child: icon is IconData
+                      ? Icon(
+                          icon as IconData,
+                          size: 20,
+                          color: iconColor,
+                        )
+                      : Image.asset(
+                          icon as String,
+                          width: 20,
+                          height: 20,
+                          color: iconColor,
+                        ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -75,8 +82,6 @@ class ProfileMenuTile extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            indent: 16,
-            endIndent: 16,
             color: borderColor,
           ),
       ],

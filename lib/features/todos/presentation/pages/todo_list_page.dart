@@ -54,7 +54,7 @@ class _TodoListPageState extends State<TodoListPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: AppColors.errorLight,
+                  backgroundColor: isDark ? AppColors.errorDark : AppColors.errorLight,
                 ),
               );
             }

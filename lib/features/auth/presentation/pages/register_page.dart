@@ -8,6 +8,7 @@ import 'package:field_tracker/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:field_tracker/features/auth/presentation/bloc/auth_event.dart';
 import 'package:field_tracker/features/auth/presentation/bloc/auth_state.dart';
 import 'package:field_tracker/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:field_tracker/core/constants/app_icon.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -125,7 +126,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     AuthTextField(
                       label: 'Full name',
                       hint: 'John Doe',
-                      prefixIcon: Icons.person_outline,
+                      prefixIcon: AppIcon.profileInactive,
                       controller: _nameController,
                       focusNode: _nameFocus,
                       keyboardType: TextInputType.name,

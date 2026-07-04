@@ -288,7 +288,7 @@ class SettingsPage extends StatelessWidget {
                       secondaryTextColor: secondaryTextColor,
                       onTap: () => _showThemeSelector(context, state.themeModeStr),
                     ),
-                    Divider(height: 1, color: borderColor, indent: 52, endIndent: 16),
+                    Divider(height: 1, color: borderColor),
                     _buildTile(
                       icon: Icons.language_rounded,
                       title: 'Language',
@@ -302,7 +302,7 @@ class SettingsPage extends StatelessWidget {
                         'Multi-language support (Spanish, French, German) is coming soon in a future update!',
                       ),
                     ),
-                    Divider(height: 1, color: borderColor, indent: 52, endIndent: 16),
+                    Divider(height: 1, color: borderColor),
                     _buildTile(
                       icon: Icons.map_outlined,
                       title: 'Default Map Style',
@@ -336,7 +336,7 @@ class SettingsPage extends StatelessWidget {
                       secondaryTextColor: secondaryTextColor,
                       onTap: () => _showGpsModeSelector(context, state.gpsMode),
                     ),
-                    Divider(height: 1, color: borderColor, indent: 52, endIndent: 16),
+                    Divider(height: 1, color: borderColor),
                     _buildTile(
                       icon: Icons.radar_rounded,
                       title: 'Default Geofence Radius',
@@ -345,7 +345,7 @@ class SettingsPage extends StatelessWidget {
                       secondaryTextColor: secondaryTextColor,
                       onTap: () => _showGeofenceRadiusSelector(context, state.defaultGeofenceRadius),
                     ),
-                    Divider(height: 1, color: borderColor, indent: 52, endIndent: 16),
+                    Divider(height: 1, color: borderColor),
                     SwitchListTile(
                       activeThumbColor: activeColor,
                       secondary: Icon(Icons.wifi_rounded, color: activeColor, size: 22),
@@ -366,7 +366,7 @@ class SettingsPage extends StatelessWidget {
                       value: state.autoSyncWifi,
                       onChanged: (val) => context.read<SettingsCubit>().updateAutoSync(val),
                     ),
-                    Divider(height: 1, color: borderColor, indent: 52, endIndent: 16),
+                    Divider(height: 1, color: borderColor),
                     SwitchListTile(
                       activeThumbColor: activeColor,
                       secondary: Icon(Icons.location_on_outlined, color: activeColor, size: 22),
@@ -408,7 +408,7 @@ class SettingsPage extends StatelessWidget {
                       showChevron: false,
                       onTap: () {},
                     ),
-                    Divider(height: 1, color: borderColor, indent: 52, endIndent: 16),
+                    Divider(height: 1, color: borderColor),
                     _buildTile(
                       icon: Icons.description_outlined,
                       title: 'Terms of Service',
@@ -421,7 +421,7 @@ class SettingsPage extends StatelessWidget {
                         'By using FieldTrack, you agree to allow background location updates for geofencing compliance and task management within authorized zones.',
                       ),
                     ),
-                    Divider(height: 1, color: borderColor, indent: 52, endIndent: 16),
+                    Divider(height: 1, color: borderColor),
                     _buildTile(
                       icon: Icons.privacy_tip_outlined,
                       title: 'Privacy Policy',
