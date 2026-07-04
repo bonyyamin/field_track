@@ -46,4 +46,6 @@ app.*.map.json
 
 # env file
 /assets/env/env.env
-
+.env
+instructions/
+*.postman_collection.json
