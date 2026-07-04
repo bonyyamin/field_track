@@ -11,12 +11,23 @@ class UserModel extends UserEntity {
     required super.role,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        id: json['id'] as String? ?? json['_id'] as String? ?? '',
-        email: json['email'] as String? ?? '',
-        fullName: json['full_name'] as String? ?? json['fullName'] as String? ?? '',
-        role: json['role'] as String? ?? 'field_user',
-      );
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    final userMap = json.containsKey('user') && json['user'] is Map<String, dynamic>
+        ? json['user'] as Map<String, dynamic>
+        : (json.containsKey('data') && json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : json);
+
+    return UserModel(
+      id: userMap['id'] as String? ?? userMap['_id'] as String? ?? '',
+      email: userMap['email'] as String? ?? '',
+      fullName: userMap['full_name'] as String? ??
+          userMap['fullName'] as String? ??
+          userMap['name'] as String? ??
+          '',
+      role: userMap['role'] as String? ?? 'field_user',
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

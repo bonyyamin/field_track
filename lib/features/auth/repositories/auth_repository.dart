@@ -22,9 +22,6 @@ abstract class AuthRepository {
   /// Fetch the currently authenticated user profile from API.
   Future<Either<Failure, UserEntity>> getCurrentUser();
 
-  /// Updates local user profile details (full name & email).
-  Future<Either<Failure, UserEntity>> updateProfile(String fullName, String email);
-
   /// Returns true if a non-expired access token exists locally.
   Future<Either<Failure, bool>> hasValidSession();
 }

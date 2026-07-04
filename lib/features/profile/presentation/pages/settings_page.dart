@@ -266,7 +266,8 @@ class SettingsPage extends StatelessWidget {
             ),
             centerTitle: true,
           ),
-          body: SingleChildScrollView(
+          body: SafeArea(
+            child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -439,6 +440,7 @@ class SettingsPage extends StatelessWidget {
               ],
             ),
           ),
+        ),
         );
       },
     );
@@ -483,22 +485,26 @@ class SettingsPage extends StatelessWidget {
     required bool isDark,
     required List<Widget> children,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1),
-        boxShadow: isDark
-            ? []
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+    return Material(
+      color: cardBg,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderColor, width: 1),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+        ),
+        child: Column(children: children),
       ),
-      child: Column(children: children),
     );
   }
 

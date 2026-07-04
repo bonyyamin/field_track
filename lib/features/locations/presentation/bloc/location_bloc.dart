@@ -27,16 +27,31 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     LoadLocations event,
     Emitter<LocationState> emit,
   ) async {
-    emit(const LocationLoading());
+    final currentQuery = state is LocationLoaded ? (state as LocationLoaded).searchQuery : '';
+    if (state is! LocationLoaded) {
+      emit(const LocationLoading());
+    }
     final result = await getLocationsUseCase(const NoParams());
     result.fold(
       (failure) => emit(LocationError(failure.message)),
-      (locations) => emit(
-        LocationLoaded(
-          allLocations: locations,
-          filteredLocations: locations,
-        ),
-      ),
+      (locations) {
+        final filtered = currentQuery.isEmpty
+            ? locations
+            : locations.where((loc) {
+                final name = loc.locationName.toLowerCase();
+                final coords = '${loc.latitude}, ${loc.longitude}'.toLowerCase();
+                return name.contains(currentQuery.toLowerCase()) ||
+                    coords.contains(currentQuery.toLowerCase());
+              }).toList();
+
+        emit(
+          LocationLoaded(
+            allLocations: locations,
+            filteredLocations: filtered,
+            searchQuery: currentQuery,
+          ),
+        );
+      },
     );
   }
 

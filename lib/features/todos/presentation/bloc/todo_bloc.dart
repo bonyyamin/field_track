@@ -124,22 +124,26 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
     final result = await syncPendingTodosUseCase(const NoParams());
 
-    result.fold(
-      (_) => emit((state as TodoLoadedState).copyWith(isSyncing: false)),
-      (_) async {
-        // Reload fresh list from repository
-        final reloadResult = await getTodosUseCase(const GetTodosParams(forceRefresh: true));
-        reloadResult.fold(
-          (_) => emit((state as TodoLoadedState).copyWith(isSyncing: false)),
-          (todos) {
-            emit(currentState.copyWith(
-              allTodos: todos,
-              isSyncing: false,
-            ));
-          },
-        );
-      },
-    );
+    if (result.isLeft) {
+      if (state is TodoLoadedState) {
+        emit((state as TodoLoadedState).copyWith(isSyncing: false));
+      }
+      return;
+    }
+
+    // Reload fresh list from repository after sync attempt
+    final reloadResult = await getTodosUseCase(const GetTodosParams(forceRefresh: true));
+    if (state is TodoLoadedState) {
+      reloadResult.fold(
+        (_) => emit((state as TodoLoadedState).copyWith(isSyncing: false)),
+        (todos) {
+          emit((state as TodoLoadedState).copyWith(
+            allTodos: todos,
+            isSyncing: false,
+          ));
+        },
+      );
+    }
   }
 
   void _onConnectivityChanged(

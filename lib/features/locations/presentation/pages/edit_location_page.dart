@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:field_tracker/core/constants/app_icon.dart';
 import 'package:field_tracker/core/theme/app_colors.dart';
 import 'package:field_tracker/core/theme/app_text_styles.dart';
 import '../../domain/entities/location_entity.dart';
@@ -140,7 +141,8 @@ class _EditLocationPageState extends State<EditLocationPage> {
         ),
         centerTitle: false,
       ),
-      body: BlocListener<LocationBloc, LocationState>(
+      body: SafeArea(
+        child: BlocListener<LocationBloc, LocationState>(
         listener: (context, state) {
           if (state is LocationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -351,7 +353,7 @@ class _EditLocationPageState extends State<EditLocationPage> {
                           height: 52,
                           child: OutlinedButton.icon(
                             onPressed: isSubmitting ? null : _onConfirmDelete,
-                            icon: Icon(Icons.delete_outline, color: errorColor, size: 20),
+                            icon: Image.asset(AppIcon.trash, width: 20, height: 20, color: errorColor),
                             label: Text(
                               'Delete location',
                               style: AppTextStyles.button.copyWith(
@@ -378,6 +380,7 @@ class _EditLocationPageState extends State<EditLocationPage> {
           ),
         ),
       ),
+    ),
     );
   }
 

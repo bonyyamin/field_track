@@ -28,42 +28,43 @@ class TodoRepositoryImpl implements TodoRepository {
     final now = DateTime.now();
     return [
       TodoModel(
-        id: '1',
-        title: 'Take inventory count',
-        description: 'Count shelf stock and storage stock',
-        isCompleted: true,
-        updatedAt: DateTime(now.year, now.month, now.day, 9, 30),
-        syncStatus: SyncStatus.synced,
-      ),
-      TodoModel(
-        id: '2',
+        id: '66511c4f8d1a2b3c4d5e6f01',
         title: 'Visit branch manager',
-        description: 'Collect signed documents',
+        description: 'Collect signed documents from downtown branch',
         isCompleted: false,
-        dueAt: DateTime(now.year, now.month, now.day, 10, 0),
+        dueAt: DateTime(now.year, now.month, now.day, 9, 0),
         updatedAt: now,
         syncStatus: SyncStatus.synced,
       ),
       TodoModel(
-        id: '3',
-        title: 'Verify delivery shipment',
-        description: 'Check items against the manifest',
+        id: '66511c4f8d1a2b3c4d5e6f02',
+        title: 'Take inventory count',
+        description: 'Count shelf stock and storage stock in warehouse',
         isCompleted: false,
-        dueAt: DateTime(now.year, now.month, now.day, 11, 30),
+        dueAt: DateTime(now.year, now.month, now.day, 11, 0),
         updatedAt: now,
         syncStatus: SyncStatus.synced,
       ),
       TodoModel(
-        id: '4',
-        title: 'Update store display',
-        description: 'Arrange promotional materials',
+        id: '66511c4f8d1a2b3c4d5e6f03',
+        title: 'Inspect service desk',
+        description: 'Check system readiness and staff attendance',
         isCompleted: false,
-        dueAt: DateTime(now.year, now.month, now.day, 14, 0),
+        dueAt: DateTime(now.year, now.month, now.day, 12, 0),
         updatedAt: now,
         syncStatus: SyncStatus.synced,
       ),
       TodoModel(
-        id: '5',
+        id: '66511c4f8d1a2b3c4d5e6f04',
+        title: 'Update location signage',
+        description: 'Replace old directional signs at city office',
+        isCompleted: true,
+        dueAt: DateTime(now.year, now.month, now.day, 13, 0),
+        updatedAt: now,
+        syncStatus: SyncStatus.synced,
+      ),
+      TodoModel(
+        id: '66511c4f8d1a2b3c4d5e6f05',
         title: 'Submit daily report',
         description: 'Log visit summary and photos',
         isCompleted: false,
@@ -161,13 +162,27 @@ class TodoRepositoryImpl implements TodoRepository {
       return const Right(null);
     }
 
+    // Purge any legacy pending changes with invalid IDs (not 24 hex characters)
+    final validPendingList = <PendingChangeModel>[];
+    for (final item in pendingList) {
+      if (item.todoId.length != 24) {
+        await localDataSource.removePendingChange(item.todoId);
+      } else {
+        validPendingList.add(item);
+      }
+    }
+
+    if (validPendingList.isEmpty) {
+      return const Right(null);
+    }
+
     final isOnline = await networkInfo.isConnected;
     if (!isOnline) {
       return const Left(NetworkFailure());
     }
 
     try {
-      final syncedIds = await remoteDataSource.syncTodos(pendingList);
+      final syncedIds = await remoteDataSource.syncTodos(validPendingList);
 
       for (final id in syncedIds) {
         await localDataSource.markTodoSynced(id);

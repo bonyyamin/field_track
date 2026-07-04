@@ -46,7 +46,7 @@ class GetSyncStatusUseCase {
     });
 
     final displayItems = rawPending.map((p) {
-      final title = todosMap[p.todoId] ?? _getFallbackTitle(p.todoId);
+      final title = todosMap[p.todoId] ?? 'Task #${p.todoId}';
       final icon = _getIconForTitle(title);
 
       return PendingChangeDisplayItem(
@@ -63,15 +63,6 @@ class GetSyncStatusUseCase {
       lastSyncedAt: lastSyncedAt,
       isOffline: !isOnline,
     );
-  }
-
-  String _getFallbackTitle(String id) {
-    if (id == '1') return 'Take inventory count';
-    if (id == '2') return 'Visit branch manager';
-    if (id == '3') return 'Verify delivery shipment';
-    if (id == '4') return 'Update store display';
-    if (id == '5') return 'Submit daily report';
-    return 'Task #$id';
   }
 
   IconData _getIconForTitle(String title) {

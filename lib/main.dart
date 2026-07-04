@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'app.dart';
@@ -14,6 +15,12 @@ import 'core/storage/local_database.dart';
 /// service, then configures dependency injection and runs [FieldTrackApp].
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Pre-load Inter Google Font to prevent font reflection/flashing (FOUT) before app starts
+  GoogleFonts.config.allowRuntimeFetching = true;
+  GoogleFonts.inter();
+  GoogleFonts.interTextTheme();
+  await GoogleFonts.pendingFonts();
 
   // Load .env before anything reads dotenv.env
   await dotenv.load(fileName: '.env');

@@ -22,9 +22,10 @@ class LocationSearchBar extends StatelessWidget {
 
     return Container(
       height: 48,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(16.0),
         border: Border.all(color: borderColor, width: 1.0),
       ),
       child: TextField(
@@ -32,6 +33,8 @@ class LocationSearchBar extends StatelessWidget {
         onChanged: onChanged,
         style: AppTextStyles.bodyMedium.copyWith(color: textColor),
         decoration: InputDecoration(
+          filled: false,
+          fillColor: Colors.transparent,
           hintText: 'Search locations',
           hintStyle: AppTextStyles.bodyMedium.copyWith(color: hintColor),
           prefixIcon: Icon(

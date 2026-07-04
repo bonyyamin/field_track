@@ -224,7 +224,8 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: SafeArea(
+        child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +253,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: successBg,
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(Icons.check_circle_rounded, color: successColor, size: 24),
                   ),
@@ -403,56 +404,61 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: borderColor, width: 1),
-              ),
-              child: Column(
-                children: List.generate(_faqs.length, (index) {
-                  final faq = _faqs[index];
-                  final isLast = index == _faqs.length - 1;
-                  return Column(
-                    children: [
-                      Theme(
-                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                        child: ExpansionTile(
-                          iconColor: activeColor,
-                          collapsedIconColor: secondaryTextColor,
-                          title: Text(
-                            faq['question']!,
-                            style: AppTextStyles.body.copyWith(
-                              color: textColor,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                              child: Text(
-                                faq['answer']!,
-                                style: AppTextStyles.cardSubtitle.copyWith(
-                                  color: secondaryTextColor,
-                                  fontSize: 13,
-                                  height: 1.5,
-                                ),
+            Material(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: borderColor, width: 1),
+                ),
+                child: Column(
+                  children: List.generate(_faqs.length, (index) {
+                    final faq = _faqs[index];
+                    final isLast = index == _faqs.length - 1;
+                    return Column(
+                      children: [
+                        Theme(
+                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            iconColor: activeColor,
+                            collapsedIconColor: secondaryTextColor,
+                            title: Text(
+                              faq['question']!,
+                              style: AppTextStyles.body.copyWith(
+                                color: textColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
                               ),
                             ),
-                          ],
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                                child: Text(
+                                  faq['answer']!,
+                                  style: AppTextStyles.cardSubtitle.copyWith(
+                                    color: secondaryTextColor,
+                                    fontSize: 13,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      if (!isLast) Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
-                    ],
-                  );
-                }),
+                        if (!isLast) Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
+                      ],
+                    );
+                  }),
+                ),
               ),
             ),
             const SizedBox(height: 28),
           ],
         ),
       ),
+    ),
     );
   }
 

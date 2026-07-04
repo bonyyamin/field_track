@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/todos/presentation/bloc/todo_bloc.dart';
+import '../../features/todos/presentation/bloc/todo_event.dart';
+import '../../features/locations/presentation/bloc/location_bloc.dart';
+import '../../features/locations/presentation/bloc/location_event.dart';
+import '../../features/sync/presentation/bloc/sync_bloc.dart';
+import '../../features/sync/presentation/bloc/sync_event.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/profile/presentation/bloc/profile_event.dart';
 import '../constants/app_icon.dart';
 import '../router/route_names.dart';
 import '../theme/app_colors.dart';
@@ -8,13 +17,18 @@ import '../theme/app_text_styles.dart';
 /// 4-tab Bottom Navigation Bar (Tasks, Locations, Sync, Profile).
 class BottomNavBar extends StatelessWidget {
   final String currentPath;
+  final StatefulNavigationShell? navigationShell;
 
   const BottomNavBar({
     super.key,
     required this.currentPath,
+    this.navigationShell,
   });
 
   int _calculateSelectedIndex(String path) {
+    if (navigationShell != null) {
+      return navigationShell!.currentIndex;
+    }
     if (path.startsWith(RouteNames.locations)) return 1;
     if (path.startsWith(RouteNames.sync)) return 2;
     if (path.startsWith(RouteNames.profile)) return 3;
@@ -22,6 +36,15 @@ class BottomNavBar extends StatelessWidget {
   }
 
   void _onItemTapped(BuildContext context, int index) {
+    if (navigationShell != null) {
+      navigationShell!.goBranch(
+        index,
+        initialLocation: index == navigationShell!.currentIndex,
+      );
+      _refreshTabSilently(context, index);
+      return;
+    }
+
     switch (index) {
       case 0:
         context.go(RouteNames.home);
@@ -35,6 +58,28 @@ class BottomNavBar extends StatelessWidget {
       case 3:
         context.go(RouteNames.profile);
         break;
+    }
+    _refreshTabSilently(context, index);
+  }
+
+  void _refreshTabSilently(BuildContext context, int index) {
+    try {
+      switch (index) {
+        case 0:
+          context.read<TodoBloc?>()?.add(const LoadTodosEvent());
+          break;
+        case 1:
+          context.read<LocationBloc?>()?.add(const LoadLocations());
+          break;
+        case 2:
+          context.read<SyncBloc?>()?.add(const LoadSyncStatus());
+          break;
+        case 3:
+          context.read<ProfileBloc?>()?.add(const RefreshProfile());
+          break;
+      }
+    } catch (_) {
+      // Ignore if Bloc is not available in tree
     }
   }
 

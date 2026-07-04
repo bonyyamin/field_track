@@ -15,14 +15,15 @@ import 'package:field_tracker/features/splash/presentation/splash_page.dart';
 import 'route_names.dart';
 
 import 'package:field_tracker/features/todos/presentation/bloc/todo_bloc.dart';
+import 'package:field_tracker/features/todos/presentation/bloc/todo_event.dart';
 import 'package:field_tracker/features/todos/presentation/pages/todo_list_page.dart';
+import 'package:field_tracker/features/locations/presentation/bloc/location_event.dart';
 import 'package:field_tracker/features/sync/presentation/bloc/sync_bloc.dart';
 import 'package:field_tracker/features/sync/presentation/bloc/sync_event.dart';
 import 'package:field_tracker/features/sync/presentation/pages/sync_page.dart';
 import 'package:field_tracker/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:field_tracker/features/profile/presentation/bloc/profile_event.dart';
 import 'package:field_tracker/features/profile/presentation/pages/profile_page.dart';
-import 'package:field_tracker/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:field_tracker/features/profile/presentation/pages/notifications_page.dart';
 import 'package:field_tracker/features/profile/presentation/pages/settings_page.dart';
 import 'package:field_tracker/features/profile/presentation/pages/help_support_page.dart';
@@ -58,40 +59,52 @@ final router = GoRouter(
         child: const RegisterPage(),
       ),
     ),
-    ShellRoute(
-      navigatorKey: shellNavigatorKey,
-      builder: (context, state, child) => AppScaffold(
-        currentPath: state.matchedLocation,
-        child: child,
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) => MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => sl<TodoBloc>()..add(const LoadTodosEvent())),
+          BlocProvider(create: (_) => sl<LocationBloc>()..add(const LoadLocations())),
+          BlocProvider(create: (_) => sl<SyncBloc>()..add(const LoadSyncStatus())),
+          BlocProvider(create: (_) => sl<ProfileBloc>()..add(const LoadProfile())),
+        ],
+        child: AppScaffold(
+          currentPath: state.matchedLocation,
+          navigationShell: navigationShell,
+          child: navigationShell,
+        ),
       ),
-      routes: [
-        GoRoute(
-          path: RouteNames.home,
-          builder: (context, state) => BlocProvider(
-            create: (_) => sl<TodoBloc>(),
-            child: const TodoListPage(),
-          ),
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.home,
+              builder: (context, state) => const TodoListPage(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: RouteNames.locations,
-          builder: (context, state) => BlocProvider(
-            create: (_) => sl<LocationBloc>(),
-            child: const LocationsListPage(),
-          ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.locations,
+              builder: (context, state) => const LocationsListPage(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: RouteNames.sync,
-          builder: (context, state) => BlocProvider(
-            create: (_) => sl<SyncBloc>()..add(const LoadSyncStatus()),
-            child: const SyncPage(),
-          ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.sync,
+              builder: (context, state) => const SyncPage(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: RouteNames.profile,
-          builder: (context, state) => BlocProvider(
-            create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
-            child: const ProfilePage(),
-          ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.profile,
+              builder: (context, state) => const ProfilePage(),
+            ),
+          ],
         ),
       ],
     ),
@@ -120,13 +133,6 @@ final router = GoRouter(
           child: EditLocationPage(location: location),
         );
       },
-    ),
-    GoRoute(
-      path: RouteNames.editProfile,
-      builder: (context, state) => BlocProvider(
-        create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
-        child: const EditProfilePage(),
-      ),
     ),
     GoRoute(
       path: RouteNames.notifications,

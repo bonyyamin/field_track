@@ -3,26 +3,22 @@ import 'package:field_tracker/core/usecase/usecase.dart';
 import 'package:field_tracker/features/auth/domain/usecases/login_usecases.dart';
 import '../../domain/entities/profile_stats.dart';
 import '../../domain/usecases/get_profile_stats_usecase.dart';
-import '../../domain/usecases/update_profile_usecase.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';
 
-/// ProfileBloc manages user profile state, update profile, and sign out logic.
+/// ProfileBloc manages user profile state and sign out logic.
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetCurrentUserUseCase getCurrentUser;
   final GetProfileStatsUseCase getProfileStats;
-  final UpdateProfileUseCase updateProfile;
   final LogoutUseCase logout;
 
   ProfileBloc({
     required this.getCurrentUser,
     required this.getProfileStats,
-    required this.updateProfile,
     required this.logout,
   }) : super(const ProfileInitial()) {
     on<LoadProfile>(_onLoadProfile);
     on<RefreshProfile>(_onRefreshProfile);
-    on<UpdateProfileSubmitted>(_onUpdateProfileSubmitted);
     on<SignOutRequested>(_onSignOutRequested);
   }
 
@@ -30,7 +26,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     LoadProfile event,
     Emitter<ProfileState> emit,
   ) async {
-    emit(const ProfileLoading());
+    if (state is! ProfileLoaded) {
+      emit(const ProfileLoading());
+    }
     await _fetchProfileData(emit);
   }
 
@@ -65,38 +63,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           )),
         );
       },
-    );
-  }
-
-  Future<void> _onUpdateProfileSubmitted(
-    UpdateProfileSubmitted event,
-    Emitter<ProfileState> emit,
-  ) async {
-    final currentState = state;
-    ProfileStats currentStats = const ProfileStats(
-      completedTasks: 0,
-      totalTasks: 0,
-      activeLocationsCount: 0,
-    );
-    if (currentState is ProfileLoaded) {
-      currentStats = currentState.stats;
-    }
-
-    emit(const ProfileLoading());
-
-    final updateResult = await updateProfile(
-      UpdateProfileParams(
-        fullName: event.fullName,
-        email: event.email,
-      ),
-    );
-
-    updateResult.fold(
-      (failure) => emit(ProfileError(failure.message)),
-      (updatedUser) => emit(ProfileLoaded(
-        user: updatedUser,
-        stats: currentStats,
-      )),
     );
   }
 

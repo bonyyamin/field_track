@@ -36,23 +36,26 @@ class _LoginPageState extends State<LoginPage> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthBloc>().add(
-          LoginRequested(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          ),
-        );
+      LoginRequested(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primary = isDark ? AppColors.primaryDark : AppColors.primaryLight;
-    final bgColor =
-        isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textPrimary =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final textSecondary = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
@@ -64,8 +67,9 @@ class _LoginPageState extends State<LoginPage> {
             ..showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor:
-                    isDark ? AppColors.errorDark : AppColors.errorLight,
+                backgroundColor: isDark
+                    ? AppColors.errorDark
+                    : AppColors.errorLight,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -74,7 +78,10 @@ class _LoginPageState extends State<LoginPage> {
             );
         }
       },
-      child: Scaffold(
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.opaque,
+        child: Scaffold(
         backgroundColor: bgColor,
         body: SafeArea(
           child: Center(
@@ -151,11 +158,14 @@ class _LoginPageState extends State<LoginPage> {
                           size: 18,
                           color: textSecondary,
                         ),
-                        onPressed: () =>
-                            setState(() => _passwordVisible = !_passwordVisible),
+                        onPressed: () => setState(
+                          () => _passwordVisible = !_passwordVisible,
+                        ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Password is required';
+                        if (v == null || v.isEmpty) {
+                          return 'Password is required';
+                        }
                         return null;
                       },
                     ),
@@ -242,7 +252,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 
@@ -265,11 +276,7 @@ class _AppLogo extends StatelessWidget {
             color: primary,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: const Icon(
-            Icons.location_on,
-            color: Colors.white,
-            size: 36,
-          ),
+          child: const Icon(Icons.location_on, color: Colors.white, size: 36),
         ),
         const SizedBox(height: 14),
         RichText(

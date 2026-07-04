@@ -184,7 +184,14 @@ class ProfilePage extends StatelessWidget {
                             ProfileMenuTile(
                               icon: Icons.person_outline_rounded,
                               label: 'Edit profile',
-                              onTap: () => context.push(RouteNames.editProfile),
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Coming soon'),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
                             ),
                             ProfileMenuTile(
                               icon: Icons.notifications_none_rounded,

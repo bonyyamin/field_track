@@ -12,4 +12,7 @@ abstract final class AppIcon {
 
   static const String profileActive = '$_basePath/profile_active.png';
   static const String profileInactive = '$_basePath/profile_inactive.png';
+
+  static const String trash = '$_basePath/trash.png';
 }
+

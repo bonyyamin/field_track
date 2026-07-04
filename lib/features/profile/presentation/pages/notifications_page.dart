@@ -103,7 +103,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: SafeArea(
+        child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,83 +121,87 @@ class _NotificationsPageState extends State<NotificationsPage> {
             const SizedBox(height: 12),
 
             // Preferences Card Container
-            Container(
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: borderColor, width: 1),
-                boxShadow: isDark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+            Material(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: borderColor, width: 1),
+                  boxShadow: isDark
+                      ? []
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.02),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                ),
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      activeThumbColor: activeColor,
+                      title: Text(
+                        'Geofence Entry Alerts',
+                        style: AppTextStyles.body.copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
-              ),
-              child: Column(
-                children: [
-                  SwitchListTile(
-                    activeThumbColor: activeColor,
-                    title: Text(
-                      'Geofence Entry Alerts',
-                      style: AppTextStyles.body.copyWith(
-                        color: textColor,
-                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                    subtitle: Text(
-                      'Trigger notifications when entering saved geofence locations',
-                      style: AppTextStyles.cardSubtitle.copyWith(
-                        color: secondaryTextColor,
-                        fontSize: 12.5,
+                      subtitle: Text(
+                        'Trigger notifications when entering saved geofence locations',
+                        style: AppTextStyles.cardSubtitle.copyWith(
+                          color: secondaryTextColor,
+                          fontSize: 12.5,
+                        ),
                       ),
+                      value: _geofenceAlerts,
+                      onChanged: (val) => setState(() => _geofenceAlerts = val),
                     ),
-                    value: _geofenceAlerts,
-                    onChanged: (val) => setState(() => _geofenceAlerts = val),
-                  ),
-                  Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
-                  SwitchListTile(
-                    activeThumbColor: activeColor,
-                    title: Text(
-                      'Sound & Vibration',
-                      style: AppTextStyles.body.copyWith(
-                        color: textColor,
-                        fontWeight: FontWeight.w600,
+                    Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
+                    SwitchListTile(
+                      activeThumbColor: activeColor,
+                      title: Text(
+                        'Sound & Vibration',
+                        style: AppTextStyles.body.copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    subtitle: Text(
-                      'Play alert sound and vibrate on geofence arrival',
-                      style: AppTextStyles.cardSubtitle.copyWith(
-                        color: secondaryTextColor,
-                        fontSize: 12.5,
+                      subtitle: Text(
+                        'Play alert sound and vibrate on geofence arrival',
+                        style: AppTextStyles.cardSubtitle.copyWith(
+                          color: secondaryTextColor,
+                          fontSize: 12.5,
+                        ),
                       ),
+                      value: _soundVibration,
+                      onChanged: (val) => setState(() => _soundVibration = val),
                     ),
-                    value: _soundVibration,
-                    onChanged: (val) => setState(() => _soundVibration = val),
-                  ),
-                  Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
-                  SwitchListTile(
-                    activeThumbColor: activeColor,
-                    title: Text(
-                      'Offline Sync Notifications',
-                      style: AppTextStyles.body.copyWith(
-                        color: textColor,
-                        fontWeight: FontWeight.w600,
+                    Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
+                    SwitchListTile(
+                      activeThumbColor: activeColor,
+                      title: Text(
+                        'Offline Sync Notifications',
+                        style: AppTextStyles.body.copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    subtitle: Text(
-                      'Notify when pending task updates complete synchronization',
-                      style: AppTextStyles.cardSubtitle.copyWith(
-                        color: secondaryTextColor,
-                        fontSize: 12.5,
+                      subtitle: Text(
+                        'Notify when pending task updates complete synchronization',
+                        style: AppTextStyles.cardSubtitle.copyWith(
+                          color: secondaryTextColor,
+                          fontSize: 12.5,
+                        ),
                       ),
+                      value: _syncAlerts,
+                      onChanged: (val) => setState(() => _syncAlerts = val),
                     ),
-                    value: _syncAlerts,
-                    onChanged: (val) => setState(() => _syncAlerts = val),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
@@ -251,7 +256,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           color: isDark
                               ? AppColors.primaryContainerDark
                               : AppColors.primaryContainerLight,
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
                           Icons.location_on_outlined,
@@ -299,6 +304,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ],
         ),
       ),
+    ),
     );
   }
 }

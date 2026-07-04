@@ -45,7 +45,10 @@ class ProfileHeader extends StatelessWidget {
     final badgeBg = isDark ? AppColors.primaryContainerDark : AppColors.primaryContainerLight;
     final badgeTextColor = isDark ? AppColors.primaryDark : AppColors.primaryLight;
 
-    final initials = _getInitials(user.fullName);
+    final displayName = user.fullName.trim().isNotEmpty
+        ? user.fullName
+        : (user.email.isNotEmpty ? user.email.split('@').first : 'User');
+    final initials = _getInitials(displayName);
     final formattedRole = _formatRole(user.role);
 
     return Container(
@@ -91,7 +94,7 @@ class ProfileHeader extends StatelessWidget {
 
           // User Full Name
           Text(
-            user.fullName,
+            displayName,
             style: AppTextStyles.headingMedium.copyWith(
               color: nameTextColor,
               fontSize: 20,

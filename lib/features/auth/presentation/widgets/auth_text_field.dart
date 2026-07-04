@@ -43,6 +43,7 @@ class AuthTextField extends StatefulWidget {
 class _AuthTextFieldState extends State<AuthTextField> {
   late FocusNode _focusNode;
   bool _isFocused = false;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -85,10 +86,13 @@ class _AuthTextFieldState extends State<AuthTextField> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final primaryColor =
-        isDark ? AppColors.primaryDark : AppColors.primaryLight;
+    final iconColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    final primaryColor = isDark
+        ? AppColors.primaryDark
+        : AppColors.primaryLight;
+    final errorColor = isDark ? AppColors.errorDark : AppColors.errorLight;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +113,9 @@ class _AuthTextFieldState extends State<AuthTextField> {
             boxShadow: [
               if (_isFocused)
                 BoxShadow(
-                  color: primaryColor.withOpacity(0.2),
+                  color: (_hasError ? errorColor : primaryColor).withValues(
+                    alpha: 0.2,
+                  ),
                   blurRadius: 8.0,
                   spreadRadius: 2.0,
                 ),
@@ -127,7 +133,23 @@ class _AuthTextFieldState extends State<AuthTextField> {
                   ? AppColors.textPrimaryDark
                   : AppColors.textPrimaryLight,
             ),
-            validator: widget.validator,
+            validator: (value) {
+              if (widget.validator != null) {
+                final error = widget.validator!(value);
+                final hasError = error != null;
+                if (_hasError != hasError) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      setState(() {
+                        _hasError = hasError;
+                      });
+                    }
+                  });
+                }
+                return error;
+              }
+              return null;
+            },
             decoration: InputDecoration(
               hintText: widget.hint,
               prefixIcon: Icon(widget.prefixIcon, size: 18, color: iconColor),

@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:field_tracker/core/theme/app_colors.dart';
 import 'package:field_tracker/core/theme/app_text_styles.dart';
+import 'package:field_tracker/features/settings/presentation/cubit/settings_cubit.dart';
 import '../../domain/entities/location_entity.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
@@ -25,9 +26,16 @@ class _AddLocationPageState extends State<AddLocationPage> {
   final TextEditingController _latController = TextEditingController(text: '25.2048');
   final TextEditingController _lngController = TextEditingController(text: '55.2708');
 
-  double _radiusM = 150.0;
+  late double _radiusM;
   bool _isActive = true;
   bool _isGettingLocation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final defaultRadius = context.read<SettingsCubit>().state.defaultGeofenceRadius;
+    _radiusM = defaultRadius.toDouble();
+  }
 
   @override
   void dispose() {
@@ -40,6 +48,51 @@ class _AddLocationPageState extends State<AddLocationPage> {
   Future<void> _fetchCurrentLocation() async {
     setState(() => _isGettingLocation = true);
     try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Location services are disabled.'),
+              action: SnackBarAction(
+                label: 'Enable',
+                onPressed: () => Geolocator.openLocationSettings(),
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permission denied.')),
+          );
+        }
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Location permissions are permanently denied.'),
+              action: SnackBarAction(
+                label: 'Settings',
+                onPressed: () => Geolocator.openAppSettings(),
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -109,7 +162,8 @@ class _AddLocationPageState extends State<AddLocationPage> {
         ),
         centerTitle: false,
       ),
-      body: BlocListener<LocationBloc, LocationState>(
+      body: SafeArea(
+        child: BlocListener<LocationBloc, LocationState>(
         listener: (context, state) {
           if (state is LocationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -353,6 +407,7 @@ class _AddLocationPageState extends State<AddLocationPage> {
           ),
         ),
       ),
+    ),
     );
   }
 

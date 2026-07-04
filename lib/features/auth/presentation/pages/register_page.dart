@@ -40,24 +40,27 @@ class _RegisterPageState extends State<RegisterPage> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthBloc>().add(
-          RegisterRequested(
-            fullName: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          ),
-        );
+      RegisterRequested(
+        fullName: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primary = isDark ? AppColors.primaryDark : AppColors.primaryLight;
-    final bgColor =
-        isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textPrimary =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final textSecondary = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
@@ -69,8 +72,9 @@ class _RegisterPageState extends State<RegisterPage> {
             ..showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor:
-                    isDark ? AppColors.errorDark : AppColors.errorLight,
+                backgroundColor: isDark
+                    ? AppColors.errorDark
+                    : AppColors.errorLight,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -79,7 +83,10 @@ class _RegisterPageState extends State<RegisterPage> {
             );
         }
       },
-      child: Scaffold(
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.opaque,
+        child: Scaffold(
         backgroundColor: bgColor,
         body: SafeArea(
           child: Center(
@@ -180,11 +187,14 @@ class _RegisterPageState extends State<RegisterPage> {
                           size: 18,
                           color: textSecondary,
                         ),
-                        onPressed: () =>
-                            setState(() => _passwordVisible = !_passwordVisible),
+                        onPressed: () => setState(
+                          () => _passwordVisible = !_passwordVisible,
+                        ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Password is required';
+                        if (v == null || v.isEmpty) {
+                          return 'Password is required';
+                        }
                         if (v.length < 6) {
                           return 'Password must be at least 6 characters';
                         }
@@ -254,7 +264,8 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 
@@ -267,17 +278,13 @@ class _RegisterLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 60,
-      height: 60,
+      width: 72,
+      height: 72,
       decoration: BoxDecoration(
         color: primary,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: const Icon(
-        Icons.location_on,
-        color: Colors.white,
-        size: 30,
-      ),
+      child: const Icon(Icons.location_on, color: Colors.white, size: 36),
     );
   }
 }

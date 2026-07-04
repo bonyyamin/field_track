@@ -68,7 +68,8 @@ class _SplashPageState extends State<SplashPage>
       },
       child: Scaffold(
         backgroundColor: bgColor,
-        body: Center(
+        body: SafeArea(
+          child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -130,6 +131,7 @@ class _SplashPageState extends State<SplashPage>
           ),
         ),
       ),
+    ),
     );
   }
 }

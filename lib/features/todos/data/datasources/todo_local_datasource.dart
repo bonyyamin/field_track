@@ -30,6 +30,15 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
   Future<void> cacheTodos(List<TodoModel> todos) async {
     final pendingKeys = _db.pendingChangesBox.keys.toSet();
 
+    // Prune obsolete cached items that are no longer on server and not pending
+    final currentKeys = _db.todosBox.keys.toList();
+    final newKeys = todos.map((t) => t.id).toSet();
+    for (final key in currentKeys) {
+      if (!newKeys.contains(key) && !pendingKeys.contains(key)) {
+        await _db.todosBox.delete(key);
+      }
+    }
+
     for (final remoteTodo in todos) {
       // Don't overwrite local un-synced state if there is a pending local change
       if (pendingKeys.contains(remoteTodo.id)) {
@@ -95,7 +104,11 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
     if (pending != null) {
       pending.retryCount += 1;
       pending.status = PendingChangeStatus.failed.name;
-      await pending.save();
+      if (pending.retryCount >= 3 || todoId.length != 24) {
+        await _db.pendingChangesBox.delete(todoId);
+      } else {
+        await pending.save();
+      }
     }
   }
 
