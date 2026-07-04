@@ -19,6 +19,9 @@ import 'package:field_tracker/features/todos/presentation/pages/todo_list_page.d
 import 'package:field_tracker/features/sync/presentation/bloc/sync_bloc.dart';
 import 'package:field_tracker/features/sync/presentation/bloc/sync_event.dart';
 import 'package:field_tracker/features/sync/presentation/pages/sync_page.dart';
+import 'package:field_tracker/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:field_tracker/features/profile/presentation/bloc/profile_event.dart';
+import 'package:field_tracker/features/profile/presentation/pages/profile_page.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -81,8 +84,9 @@ final router = GoRouter(
         ),
         GoRoute(
           path: RouteNames.profile,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Profile Screen')),
+          builder: (context, state) => BlocProvider(
+            create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
+            child: const ProfilePage(),
           ),
         ),
       ],

@@ -37,6 +37,8 @@ import 'package:field_tracker/features/todos/domain/usecases/toggle_todo_usecase
 import 'package:field_tracker/features/todos/presentation/bloc/todo_bloc.dart';
 import 'package:field_tracker/features/sync/domain/usecases/get_sync_status_usecase.dart';
 import 'package:field_tracker/features/sync/presentation/bloc/sync_bloc.dart';
+import 'package:field_tracker/features/profile/domain/usecases/get_profile_stats_usecase.dart';
+import 'package:field_tracker/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:field_tracker/core/usecase/usecase.dart';
 
 /// Global Service Locator instance
@@ -236,6 +238,22 @@ Future<void> configureDependencies({LocalDatabase? localDatabase}) async {
       networkInfo: sl<NetworkInfo>(),
       secureStorage: sl<SecureStorageService>(),
       localDatabase: sl<LocalDatabase>(),
+    ),
+  );
+
+  // ── Feature: Profile ───────────────────────────────────────────────────────
+  sl.registerLazySingleton(
+    () => GetProfileStatsUseCase(
+      todoRepository: sl<TodoRepository>(),
+      locationRepository: sl<LocationRepository>(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => ProfileBloc(
+      getCurrentUser: sl<GetCurrentUserUseCase>(),
+      getProfileStats: sl<GetProfileStatsUseCase>(),
+      logout: sl<LogoutUseCase>(),
     ),
   );
 }

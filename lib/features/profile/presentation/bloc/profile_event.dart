@@ -1,0 +1,23 @@
+import 'package:equatable/equatable.dart';
+
+sealed class ProfileEvent extends Equatable {
+  const ProfileEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Event triggered when profile page initializes or needs reloading.
+final class LoadProfile extends ProfileEvent {
+  const LoadProfile();
+}
+
+/// Event triggered when user pulls to refresh profile data.
+final class RefreshProfile extends ProfileEvent {
+  const RefreshProfile();
+}
+
+/// Event triggered when user clicks sign out button.
+final class SignOutRequested extends ProfileEvent {
+  const SignOutRequested();
+}
