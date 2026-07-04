@@ -29,14 +29,14 @@ class CacheException extends AppException {
 /// Thrown when authentication is missing, invalid, or expired (401/403).
 class UnauthorizedException extends AppException {
   const UnauthorizedException({
-    String message = 'Session expired. Please log in again.',
+    String message = 'Your session has expired. Please log in again.',
   }) : super(message, statusCode: 401);
 }
 
 /// Thrown when there is no active internet connection.
 class NetworkException extends AppException {
   const NetworkException({
-    String message = 'No internet connection available.',
+    String message = 'No internet connection. Please check your network and try again.',
   }) : super(message);
 }
 
@@ -54,13 +54,13 @@ class ValidationException extends AppException {
 /// Thrown when location permissions are denied by the user.
 class LocationPermissionException extends AppException {
   const LocationPermissionException({
-    String message = 'Location permission was denied.',
+    String message = 'Location access was denied. Please allow it in your device settings.',
   }) : super(message);
 }
 
 /// Thrown when device location services (GPS) are turned off.
 class LocationServiceDisabledException extends AppException {
   const LocationServiceDisabledException({
-    String message = 'Location services are disabled on this device.',
+    String message = 'Location services are turned off. Please enable GPS in your settings.',
   }) : super(message);
 }

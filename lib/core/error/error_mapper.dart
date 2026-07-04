@@ -16,32 +16,38 @@ Failure mapExceptionToFailure(Object e) {
     switch (e.type) {
       case DioExceptionType.connectionError:
       case DioExceptionType.connectionTimeout:
+        return const NetworkFailure('No internet connection. Please check your network and try again.');
+
       case DioExceptionType.sendTimeout:
+        return const NetworkFailure('The request timed out. Please try again.');
+
       case DioExceptionType.receiveTimeout:
-        return const NetworkFailure();
+        return const NetworkFailure('The server is not responding. Please try again later.');
 
       case DioExceptionType.badResponse:
         final statusCode = e.response?.statusCode;
         if (statusCode == 401 || statusCode == 403) {
-          return const AuthFailure();
+          final authMsg = _extractMessage(e, 'The email or password you entered is incorrect. Please try again.');
+          return AuthFailure(authMsg);
         }
         if (statusCode == 422) {
-          final message = _extractMessage(e, 'Validation error');
+          final message = _extractMessage(e, 'Please check your details and try again.');
           return ValidationFailure(message);
         }
-        final message = _extractMessage(e, 'Server error');
+        final message = _extractMessage(e, 'Something went wrong. Please try again shortly.');
         return ServerFailure(message);
 
       case DioExceptionType.cancel:
-        return const NetworkFailure('Request was cancelled');
+        return const NetworkFailure('The request was cancelled. Please try again.');
 
       default:
-        return const NetworkFailure();
+        return NetworkFailure(e.message ?? 'Something went wrong. Please check your connection and try again.');
+
     }
   }
 
   // ── Domain exceptions (thrown by data sources) ─────────────────────────
-  if (e is UnauthorizedException) return const AuthFailure();
+  if (e is UnauthorizedException) return AuthFailure(e.message);
   if (e is NetworkException) return NetworkFailure(e.message);
   if (e is ValidationException) return ValidationFailure(e.message);
   if (e is CacheException) return CacheFailure(e.message);
@@ -50,7 +56,7 @@ Failure mapExceptionToFailure(Object e) {
   }
 
   // ── Catch-all ──────────────────────────────────────────────────────────
-  return const ServerFailure('An unexpected error occurred');
+  return const ServerFailure('Something went wrong. Please try again.');
 }
 
 /// Extracts a human-readable message from a [DioException] response body.

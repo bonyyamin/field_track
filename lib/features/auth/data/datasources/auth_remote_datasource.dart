@@ -86,7 +86,9 @@ class AuthRemoteDataSource {
       throw const NetworkException();
     }
     if (statusCode == 401) {
-      throw const UnauthorizedException();
+      throw UnauthorizedException(
+        message: message ?? 'The email or password you entered is incorrect. Please try again.',
+      );
     }
     if (statusCode == 422) {
       throw ValidationException(message: message ?? 'Validation error');
