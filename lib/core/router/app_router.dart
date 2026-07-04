@@ -6,6 +6,11 @@ import 'package:field_tracker/core/widgets/app_scaffold.dart';
 import 'package:field_tracker/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:field_tracker/features/auth/presentation/pages/login_page.dart';
 import 'package:field_tracker/features/auth/presentation/pages/register_page.dart';
+import 'package:field_tracker/features/locations/domain/entities/location_entity.dart';
+import 'package:field_tracker/features/locations/presentation/bloc/location_bloc.dart';
+import 'package:field_tracker/features/locations/presentation/pages/add_location_page.dart';
+import 'package:field_tracker/features/locations/presentation/pages/edit_location_page.dart';
+import 'package:field_tracker/features/locations/presentation/pages/locations_list_page.dart';
 import 'package:field_tracker/features/splash/presentation/splash_page.dart';
 import 'route_names.dart';
 
@@ -55,8 +60,9 @@ final router = GoRouter(
         ),
         GoRoute(
           path: RouteNames.locations,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Locations Screen')),
+          builder: (context, state) => BlocProvider(
+            create: (_) => sl<LocationBloc>(),
+            child: const LocationsListPage(),
           ),
         ),
         GoRoute(
@@ -75,16 +81,27 @@ final router = GoRouter(
     ),
     GoRoute(
       path: RouteNames.addLocation,
-      builder: (context, state) => const Scaffold(
-        body: Center(child: Text('Add Location Screen')),
+      builder: (context, state) => BlocProvider(
+        create: (_) => sl<LocationBloc>(),
+        child: const AddLocationPage(),
       ),
     ),
     GoRoute(
       path: RouteNames.editLocation,
       builder: (context, state) {
         final id = state.pathParameters['id'] ?? '';
-        return Scaffold(
-          body: Center(child: Text('Edit Location Screen ($id)')),
+        final location = state.extra is LocationEntity
+            ? state.extra as LocationEntity
+            : LocationEntity(
+                id: id,
+                locationName: 'Location',
+                latitude: 0,
+                longitude: 0,
+                radiusM: 100,
+              );
+        return BlocProvider(
+          create: (_) => sl<LocationBloc>(),
+          child: EditLocationPage(location: location),
         );
       },
     ),

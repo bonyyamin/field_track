@@ -61,7 +61,7 @@ class _SplashPageState extends State<SplashPage>
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.go(RouteNames.home);
+          context.go(RouteNames.locations);
         } else if (state is AuthUnauthenticated) {
           context.go(RouteNames.login);
         }

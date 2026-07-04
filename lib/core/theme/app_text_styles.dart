@@ -86,4 +86,13 @@ abstract final class AppTextStyles {
     fontWeight: FontWeight.w700,
     fontSize: 13.5,
   );
+
+  // ── Convenience Aliases ──
+  static TextStyle get h1 => headingMedium;
+  static TextStyle get h2 => title;
+  static TextStyle get h3 => cardTitle;
+  static TextStyle get h4 => cardTitle;
+  static TextStyle get bodyMedium => body;
+  static TextStyle get bodySmall => cardSubtitle;
+  static TextStyle get caption => status;
 }

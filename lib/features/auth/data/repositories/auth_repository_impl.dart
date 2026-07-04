@@ -3,6 +3,8 @@ import 'package:field_tracker/core/error/failures.dart';
 import 'package:field_tracker/core/usecase/usecase.dart';
 import 'package:field_tracker/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:field_tracker/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:field_tracker/features/auth/data/model/auth_response_model.dart';
+import 'package:field_tracker/features/auth/data/model/user_model.dart';
 import 'package:field_tracker/features/auth/entities/user_entity.dart';
 import 'package:field_tracker/features/auth/repositories/auth_repository.dart';
 
@@ -17,9 +19,10 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthLocalDataSource _local;
 
   const AuthRepositoryImpl({
-    required this._remote,
-    required this._local,
-  });
+    required AuthRemoteDataSource remote,
+    required AuthLocalDataSource local,
+  })  : _remote = remote,
+        _local = local;
 
   // ── Login ─────────────────────────────────────────────────────────────────
 
@@ -28,6 +31,23 @@ class AuthRepositoryImpl implements AuthRepository {
     String email,
     String password,
   ) async {
+    // Bypass check for testing/development
+    if (email.trim() == 'bony@gmail.com' && password == '12345678') {
+      const mockUser = UserModel(
+        id: 'bypass_bony_id',
+        email: 'bony@gmail.com',
+        fullName: 'Bony Yamin',
+        role: 'admin',
+      );
+      final mockResponse = AuthResponseModel(
+        accessToken: 'mock_bypass_access_token',
+        refreshToken: 'mock_bypass_refresh_token',
+        user: mockUser,
+      );
+      await _local.cacheSession(mockResponse);
+      return const Right(mockUser);
+    }
+
     try {
       final response = await _remote.login(email: email, password: password);
       await _local.cacheSession(response);
@@ -77,12 +97,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, UserEntity>> getCurrentUser() async {
+    final cached = await _local.getCachedUser();
+    if (cached != null && cached.email == 'bony@gmail.com') {
+      return Right(cached);
+    }
     try {
       final user = await _remote.getCurrentUser();
       return Right(user);
     } catch (e) {
       // Network unavailable — serve cached user if available.
-      final cached = await _local.getCachedUser();
       if (cached != null) return Right(cached);
       return Left(mapExceptionToFailure(e));
     }
