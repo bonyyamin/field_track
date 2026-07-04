@@ -20,7 +20,7 @@ class DioClient {
     required SecureStorageService secureStorage,
     required NetworkInfo networkInfo,
   }) {
-    final baseUrl = dotenv.env['BASE_URL'] ?? 'https://api.fieldtrack.app';
+    final baseUrl = dotenv.env['BASE_URL'] ?? '';
 
     dio = Dio(
       BaseOptions(

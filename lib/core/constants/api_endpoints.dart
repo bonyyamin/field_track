@@ -1,7 +1,9 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 /// Single source of truth for API endpoint path strings.
 abstract final class ApiEndpoints {
   // Base configuration
-  static const String baseUrl = 'https://api.fieldtrack.app';
+  static String get baseUrl => dotenv.env['BASE_URL'] ?? '';
   static const String apiVersion = '/api/v1';
 
   // Auth endpoints
