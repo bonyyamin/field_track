@@ -111,6 +111,28 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  // ── Update profile ────────────────────────────────────────────────────────
+
+  @override
+  Future<Either<Failure, UserEntity>> updateProfile(
+    String fullName,
+    String email,
+  ) async {
+    try {
+      final cached = await _local.getCachedUser();
+      final updatedUser = UserModel(
+        id: cached?.id ?? 'user_id',
+        email: email.trim(),
+        fullName: fullName.trim(),
+        role: cached?.role ?? 'field_user',
+      );
+      await _local.updateCachedUser(updatedUser);
+      return Right(updatedUser);
+    } catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
   // ── Has valid session ─────────────────────────────────────────────────────
 
   @override

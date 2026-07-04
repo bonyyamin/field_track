@@ -11,6 +11,7 @@ class AppButton extends StatelessWidget {
   final Widget? icon;
   final Color? backgroundColor;
   final Color? textColor;
+  final Color? borderColor;
   final double? width;
   final double height;
   final BorderRadius? borderRadius;
@@ -24,6 +25,7 @@ class AppButton extends StatelessWidget {
     this.icon,
     this.backgroundColor,
     this.textColor,
+    this.borderColor,
     this.width = double.infinity,
     this.height = 48.0,
     this.borderRadius,
@@ -37,6 +39,7 @@ class AppButton extends StatelessWidget {
     this.icon,
     this.backgroundColor,
     this.textColor,
+    this.borderColor,
     this.width = double.infinity,
     this.height = 48.0,
     this.borderRadius,
@@ -48,7 +51,7 @@ class AppButton extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final defaultBg = isOutline
-        ? Colors.transparent
+        ? (backgroundColor ?? Colors.transparent)
         : (backgroundColor ??
             (isDark ? AppColors.primaryButtonDark : AppColors.primaryButtonLight));
 
@@ -56,12 +59,16 @@ class AppButton extends StatelessWidget {
         ? (textColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryLight))
         : (textColor ?? (isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight));
 
+    final defaultBorderColor = borderColor ??
+        (isOutline
+            ? (textColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryLight))
+            : Colors.transparent);
+
     final shape = RoundedRectangleBorder(
       borderRadius: borderRadius ?? BorderRadius.circular(10),
       side: isOutline
           ? BorderSide(
-              color: backgroundColor ??
-                  (isDark ? AppColors.primaryDark : AppColors.primaryLight),
+              color: defaultBorderColor,
               width: 1.5,
             )
           : BorderSide.none,

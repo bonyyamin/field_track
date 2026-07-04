@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../constants/app_icon.dart';
 import '../router/route_names.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
@@ -66,25 +67,25 @@ class BottomNavBar extends StatelessWidget {
         unselectedItemColor: unselectedColor,
         selectedLabelStyle: AppTextStyles.navbar,
         unselectedLabelStyle: AppTextStyles.navbar,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.check_box_outlined),
-            activeIcon: Icon(Icons.check_box),
+            icon: Image.asset(AppIcon.tasksInactive, width: 24, height: 24),
+            activeIcon: Image.asset(AppIcon.tasksActive, width: 24, height: 24),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.location_on_outlined),
-            activeIcon: Icon(Icons.location_on),
+            icon: Image.asset(AppIcon.locationInactive, width: 24, height: 24),
+            activeIcon: Image.asset(AppIcon.locationActive, width: 24, height: 24),
             label: 'Locations',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.sync_outlined),
-            activeIcon: Icon(Icons.sync),
+            icon: Image.asset(AppIcon.syncInactive, width: 24, height: 24),
+            activeIcon: Image.asset(AppIcon.syncActive, width: 24, height: 24),
             label: 'Sync',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
+            icon: Image.asset(AppIcon.profileInactive, width: 24, height: 24),
+            activeIcon: Image.asset(AppIcon.profileActive, width: 24, height: 24),
             label: 'Profile',
           ),
         ],

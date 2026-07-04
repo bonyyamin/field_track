@@ -74,16 +74,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  void _showComingSoonSnackBar(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature feature coming soon!'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,22 +184,22 @@ class ProfilePage extends StatelessWidget {
                             ProfileMenuTile(
                               icon: Icons.person_outline_rounded,
                               label: 'Edit profile',
-                              onTap: () => _showComingSoonSnackBar(context, 'Edit profile'),
+                              onTap: () => context.push(RouteNames.editProfile),
                             ),
                             ProfileMenuTile(
                               icon: Icons.notifications_none_rounded,
                               label: 'Notifications',
-                              onTap: () => _showComingSoonSnackBar(context, 'Notifications'),
+                              onTap: () => context.push(RouteNames.notifications),
                             ),
                             ProfileMenuTile(
                               icon: Icons.settings_outlined,
                               label: 'Settings',
-                              onTap: () => _showComingSoonSnackBar(context, 'Settings'),
+                              onTap: () => context.push(RouteNames.settings),
                             ),
                             ProfileMenuTile(
                               icon: Icons.help_outline_rounded,
                               label: 'Help & support',
-                              onTap: () => _showComingSoonSnackBar(context, 'Help & support'),
+                              onTap: () => context.push(RouteNames.helpSupport),
                               showDivider: false,
                             ),
                           ],
@@ -220,13 +210,15 @@ class ProfilePage extends StatelessWidget {
                       // Sign Out Button
                       AppButton.outline(
                         label: 'Sign out',
+                        height: 50,
+                        borderRadius: BorderRadius.circular(28),
                         icon: Icon(
                           Icons.logout_rounded,
                           size: 20,
                           color: errorColor,
                         ),
                         textColor: errorColor,
-                        backgroundColor: Colors.transparent,
+                        borderColor: errorColor,
                         onPressed: () => _showSignOutDialog(context),
                       ),
 

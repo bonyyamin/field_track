@@ -14,6 +14,7 @@ class LocalDatabase {
   static const String _pendingChangesBoxName = 'pending_changes';
   static const String _locationsBoxName = 'locations';
   static const String _geofenceStateBoxName = 'geofence_state';
+  static const String _settingsBoxName = 'settings';
 
   // ── Box accessors ───────────────────────────────────────────────────────
 
@@ -31,6 +32,9 @@ class LocalDatabase {
   /// Box storing a `bool` per location id indicating whether the device is
   /// currently inside that geofence.  Used by [GeofenceStateCache].
   late Box<bool> geofenceStateBox;
+
+  /// Box storing key-value dynamic app settings preferences.
+  late Box<dynamic> settingsBox;
 
   // ── Initialisation ──────────────────────────────────────────────────────
 
@@ -60,6 +64,7 @@ class LocalDatabase {
         await Hive.openBox<PendingChangeHiveModel>(_pendingChangesBoxName);
     locationsBox = await Hive.openBox<LocationHiveModel>(_locationsBoxName);
     geofenceStateBox = await Hive.openBox<bool>(_geofenceStateBoxName);
+    settingsBox = await Hive.openBox<dynamic>(_settingsBoxName);
   }
 
   // ── Convenience helpers ─────────────────────────────────────────────────
@@ -70,6 +75,7 @@ class LocalDatabase {
     await pendingChangesBox.clear();
     await locationsBox.clear();
     await geofenceStateBox.clear();
+    await settingsBox.clear();
   }
 
   /// Closes all open boxes gracefully.

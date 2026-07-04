@@ -9,6 +9,7 @@ import 'package:field_tracker/core/services/notification/notification_service.da
 import 'package:field_tracker/core/storage/database_tables.dart';
 import 'package:field_tracker/core/storage/local_database.dart';
 import 'package:field_tracker/features/locations/domain/entities/location_entity.dart';
+import 'package:field_tracker/features/settings/domain/repositories/settings_repository.dart';
 
 const String kGeofenceTaskName = 'geofenceTask';
 const String kGeofenceTaskUniqueName = 'geofence-check';
@@ -38,12 +39,28 @@ void callbackDispatcher() {
 
 Future<bool> _runGeofenceCheck(LocalDatabase db) async {
   try {
+    final settingsRepo = sl.isRegistered<SettingsRepository>()
+        ? sl<SettingsRepository>()
+        : null;
+    final settings = settingsRepo?.getSettings();
+
+    if (settings != null && !settings.backgroundLocationEnabled) {
+      return true;
+    }
+
+    LocationAccuracy accuracy = LocationAccuracy.high;
+    if (settings?.gpsMode == 'Balanced Mode') {
+      accuracy = LocationAccuracy.medium;
+    } else if (settings?.gpsMode == 'Battery Saver Mode') {
+      accuracy = LocationAccuracy.low;
+    }
+
     await sl<NotificationService>().init();
 
     final position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 10),
+      locationSettings: LocationSettings(
+        accuracy: accuracy,
+        timeLimit: const Duration(seconds: 10),
       ),
     );
 

@@ -22,6 +22,10 @@ import 'package:field_tracker/features/sync/presentation/pages/sync_page.dart';
 import 'package:field_tracker/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:field_tracker/features/profile/presentation/bloc/profile_event.dart';
 import 'package:field_tracker/features/profile/presentation/pages/profile_page.dart';
+import 'package:field_tracker/features/profile/presentation/pages/edit_profile_page.dart';
+import 'package:field_tracker/features/profile/presentation/pages/notifications_page.dart';
+import 'package:field_tracker/features/profile/presentation/pages/settings_page.dart';
+import 'package:field_tracker/features/profile/presentation/pages/help_support_page.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -116,6 +120,25 @@ final router = GoRouter(
           child: EditLocationPage(location: location),
         );
       },
+    ),
+    GoRoute(
+      path: RouteNames.editProfile,
+      builder: (context, state) => BlocProvider(
+        create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
+        child: const EditProfilePage(),
+      ),
+    ),
+    GoRoute(
+      path: RouteNames.notifications,
+      builder: (context, state) => const NotificationsPage(),
+    ),
+    GoRoute(
+      path: RouteNames.settings,
+      builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
+      path: RouteNames.helpSupport,
+      builder: (context, state) => const HelpSupportPage(),
     ),
   ],
 );

@@ -1,3 +1,4 @@
+import 'package:field_tracker/core/constants/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:field_tracker/core/theme/app_colors.dart';
@@ -42,6 +43,7 @@ class _TodoListPageState extends State<TodoListPage> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final scaffoldBg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    
 
     return Scaffold(
       backgroundColor: scaffoldBg,
@@ -101,9 +103,11 @@ class _TodoListPageState extends State<TodoListPage> {
                                     color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                                   ),
                                 )
-                              : Icon(
-                                  Icons.sync_rounded,
+                              : Image.asset(
+                                  AppIcon.syncInactive,
                                   color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                                  width: 24,
+                                  height: 24,
                                 ),
                           onPressed: state.isSyncing
                               ? null

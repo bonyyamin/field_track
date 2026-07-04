@@ -27,6 +27,11 @@ class AuthLocalDataSource {
     await _secureStorage.saveUserData(jsonEncode(response.user.toJson()));
   }
 
+  /// Updates the cached user profile data locally.
+  Future<void> updateCachedUser(UserModel user) async {
+    await _secureStorage.saveUserData(jsonEncode(user.toJson()));
+  }
+
   // ── Read ──────────────────────────────────────────────────────────────────
 
   /// Returns the cached [UserModel] or `null` if no session exists.

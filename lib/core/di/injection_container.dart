@@ -38,7 +38,12 @@ import 'package:field_tracker/features/todos/presentation/bloc/todo_bloc.dart';
 import 'package:field_tracker/features/sync/domain/usecases/get_sync_status_usecase.dart';
 import 'package:field_tracker/features/sync/presentation/bloc/sync_bloc.dart';
 import 'package:field_tracker/features/profile/domain/usecases/get_profile_stats_usecase.dart';
+import 'package:field_tracker/features/profile/domain/usecases/update_profile_usecase.dart';
 import 'package:field_tracker/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:field_tracker/features/settings/data/datasources/settings_local_datasource.dart';
+import 'package:field_tracker/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:field_tracker/features/settings/domain/repositories/settings_repository.dart';
+import 'package:field_tracker/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:field_tracker/core/usecase/usecase.dart';
 
 /// Global Service Locator instance
@@ -248,12 +253,27 @@ Future<void> configureDependencies({LocalDatabase? localDatabase}) async {
       locationRepository: sl<LocationRepository>(),
     ),
   );
+  sl.registerLazySingleton(
+    () => UpdateProfileUseCase(sl<AuthRepository>()),
+  );
 
   sl.registerFactory(
     () => ProfileBloc(
       getCurrentUser: sl<GetCurrentUserUseCase>(),
       getProfileStats: sl<GetProfileStatsUseCase>(),
+      updateProfile: sl<UpdateProfileUseCase>(),
       logout: sl<LogoutUseCase>(),
     ),
+  );
+
+  // ── Feature: Settings ─────────────────────────────────────────────────────
+  sl.registerLazySingleton<SettingsLocalDataSource>(
+    () => SettingsLocalDataSourceImpl(sl<LocalDatabase>()),
+  );
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(sl<SettingsLocalDataSource>()),
+  );
+  sl.registerFactory(
+    () => SettingsCubit(sl<SettingsRepository>()),
   );
 }
