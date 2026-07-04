@@ -14,6 +14,9 @@ import 'package:field_tracker/features/locations/presentation/pages/locations_li
 import 'package:field_tracker/features/splash/presentation/splash_page.dart';
 import 'route_names.dart';
 
+import 'package:field_tracker/features/todos/presentation/bloc/todo_bloc.dart';
+import 'package:field_tracker/features/todos/presentation/pages/todo_list_page.dart';
+
 final GlobalKey<NavigatorState> rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> shellNavigatorKey =
@@ -54,8 +57,9 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: RouteNames.home,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Tasks Screen')),
+          builder: (context, state) => BlocProvider(
+            create: (_) => sl<TodoBloc>(),
+            child: const TodoListPage(),
           ),
         ),
         GoRoute(

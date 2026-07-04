@@ -27,6 +27,16 @@ import 'package:field_tracker/features/locations/domain/repositories/location_re
 import 'package:field_tracker/features/locations/domain/usecases/location_usecases.dart';
 import 'package:field_tracker/features/locations/presentation/bloc/location_bloc.dart';
 
+import 'package:field_tracker/features/todos/data/datasources/todo_local_datasource.dart';
+import 'package:field_tracker/features/todos/data/datasources/todo_remote_datasource.dart';
+import 'package:field_tracker/features/todos/data/repositories/todo_repository_impl.dart';
+import 'package:field_tracker/features/todos/domain/repositories/todo_repository.dart';
+import 'package:field_tracker/features/todos/domain/usecases/get_todos_usecase.dart';
+import 'package:field_tracker/features/todos/domain/usecases/sync_pending_todos_usecase.dart';
+import 'package:field_tracker/features/todos/domain/usecases/toggle_todo_usecase.dart';
+import 'package:field_tracker/features/todos/presentation/bloc/todo_bloc.dart';
+import 'package:field_tracker/core/usecase/usecase.dart';
+
 /// Global Service Locator instance
 final sl = GetIt.instance;
 
@@ -98,7 +108,10 @@ Future<void> configureDependencies({LocalDatabase? localDatabase}) async {
   sl.registerLazySingleton<SyncService>(
     () => SyncService(
       networkInfo: sl<NetworkInfo>(),
-      syncCallback: () async => true, // Replaced by todos feature registration
+      syncCallback: () async {
+        final result = await sl<SyncPendingTodosUseCase>()(const NoParams());
+        return result.isRight;
+      },
     ),
   );
 
@@ -174,7 +187,36 @@ Future<void> configureDependencies({LocalDatabase? localDatabase}) async {
   );
 
   // ── Feature: Todos & Sync ─────────────────────────────────────────────────
-  // TODO: Register TodoRemoteDataSource, TodoLocalDataSource (Hive),
-  //       TodoRepositoryImpl, todo use cases, and wire the real
-  //       SyncPendingChangesCallback into SyncService.
+
+  // Data sources
+  sl.registerLazySingleton<TodoRemoteDataSource>(
+    () => TodoRemoteDataSourceImpl(sl<Dio>()),
+  );
+  sl.registerLazySingleton<TodoLocalDataSource>(
+    () => TodoLocalDataSourceImpl(sl<LocalDatabase>()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<TodoRepository>(
+    () => TodoRepositoryImpl(
+      remoteDataSource: sl<TodoRemoteDataSource>(),
+      localDataSource: sl<TodoLocalDataSource>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetTodosUseCase(sl<TodoRepository>()));
+  sl.registerLazySingleton(() => ToggleTodoUseCase(sl<TodoRepository>()));
+  sl.registerLazySingleton(() => SyncPendingTodosUseCase(sl<TodoRepository>()));
+
+  // BLoC
+  sl.registerFactory(
+    () => TodoBloc(
+      getTodosUseCase: sl<GetTodosUseCase>(),
+      toggleTodoUseCase: sl<ToggleTodoUseCase>(),
+      syncPendingTodosUseCase: sl<SyncPendingTodosUseCase>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
 }
