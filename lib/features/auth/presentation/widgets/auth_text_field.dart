@@ -147,7 +147,7 @@ class _GlowInputBorder extends InputBorder {
     canvas.drawRRect(
       rrect,
       Paint()
-        ..color = color.withOpacity(0.4)
+        ..color = color.withValues(alpha: 0.4)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.5
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.5),

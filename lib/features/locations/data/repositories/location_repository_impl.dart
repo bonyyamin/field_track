@@ -14,12 +14,10 @@ class LocationRepositoryImpl implements LocationRepository {
   final NetworkInfo _networkInfo;
 
   const LocationRepositoryImpl({
-    required LocationRemoteDataSource remoteDataSource,
-    required LocationLocalDataSource localDataSource,
-    required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+    required this._remoteDataSource,
+    required this._localDataSource,
+    required this._networkInfo,
+  });
 
   @override
   Future<Either<Failure, List<LocationEntity>>> getLocations() async {

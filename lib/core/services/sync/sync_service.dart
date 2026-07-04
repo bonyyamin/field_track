@@ -19,10 +19,9 @@ class SyncService {
   final SyncPendingChangesCallback _syncCallback;
 
   SyncService({
-    required NetworkInfo networkInfo,
-    required SyncPendingChangesCallback syncCallback,
-  })  : _networkInfo = networkInfo,
-        _syncCallback = syncCallback;
+    required this._networkInfo,
+    required this._syncCallback,
+  });
 
   // ── Internal state ──────────────────────────────────────────────────────
 

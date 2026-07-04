@@ -12,12 +12,10 @@ class GeofenceService {
   final double _hysteresis;
 
   const GeofenceService({
-    required GeofenceStateCache stateCache,
-    required NotificationService notificationService,
-    double hysteresis = AppConstants.geofenceHysteresisMeters,
-  })  : _stateCache = stateCache,
-        _notificationService = notificationService,
-        _hysteresis = hysteresis;
+    required this._stateCache,
+    required this._notificationService,
+    this._hysteresis = AppConstants.geofenceHysteresisMeters,
+  });
 
   // ── Public API ──────────────────────────────────────────────────────────
 

@@ -25,6 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordFocus = FocusNode();
   bool _passwordVisible = false;
 
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -35,7 +37,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
     context.read<AuthBloc>().add(
       LoginRequested(
         email: _emailController.text.trim(),
@@ -83,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Form(
                   key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  autovalidateMode: _autovalidateMode,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -169,9 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {
-                            // TODO: navigate to forgot-password screen
-                          },
+                          onPressed: () {},
                           style: TextButton.styleFrom(
                             foregroundColor: primary,
                             padding: const EdgeInsets.only(top: 4),

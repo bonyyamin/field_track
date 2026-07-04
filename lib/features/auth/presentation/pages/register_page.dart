@@ -28,6 +28,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordFocus = FocusNode();
   bool _passwordVisible = false;
 
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -40,7 +42,10 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
     context.read<AuthBloc>().add(
       RegisterRequested(
         fullName: _nameController.text.trim(),
@@ -89,7 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Form(
                   key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  autovalidateMode: _autovalidateMode,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
