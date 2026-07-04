@@ -9,6 +9,7 @@ import 'package:field_tracker/features/auth/presentation/bloc/auth_event.dart';
 import 'package:field_tracker/features/auth/presentation/bloc/auth_state.dart';
 import 'package:field_tracker/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:field_tracker/core/constants/app_icon.dart';
+import 'package:field_tracker/core/widgets/app_toast.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -68,20 +69,11 @@ class _RegisterPageState extends State<RegisterPage> {
         if (state is AuthAuthenticated) {
           context.go(RouteNames.home);
         } else if (state is AuthFailureState) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: isDark
-                    ? AppColors.errorDark
-                    : AppColors.errorLight,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
+          AppToast.show(
+            context,
+            message: state.message,
+            isError: true,
+          );
         }
       },
       child: GestureDetector(
@@ -92,173 +84,177 @@ class _RegisterPageState extends State<RegisterPage> {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 16),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 450),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 16),
 
-                    // ── Logo ────────────────────────────────────────────────
-                    _RegisterLogo(primary: primary),
+                      // ── Logo ────────────────────────────────────────────────
+                      _RegisterLogo(primary: primary),
 
-                    const SizedBox(height: 28),
+                      const SizedBox(height: 28),
 
-                    // ── Heading ─────────────────────────────────────────────
-                    Text(
-                      'Create your account',
-                      style: AppTextStyles.headingLarge.copyWith(
-                        color: textPrimary,
+                      // ── Heading ─────────────────────────────────────────────
+                      Text(
+                        'Create your account',
+                        style: AppTextStyles.headingLarge.copyWith(
+                          color: textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Join your team on FieldTrack',
-                      style: AppTextStyles.subtitle.copyWith(
-                        color: textSecondary,
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // ── Full name ───────────────────────────────────────────
-                    AuthTextField(
-                      label: 'Full name',
-                      hint: 'John Doe',
-                      prefixIcon: AppIcon.profileInactive,
-                      controller: _nameController,
-                      focusNode: _nameFocus,
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) =>
-                          FocusScope.of(context).requestFocus(_emailFocus),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Full name is required';
-                        }
-                        if (v.trim().length < 2) {
-                          return 'Name must be at least 2 characters';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // ── Email ───────────────────────────────────────────────
-                    AuthTextField(
-                      label: 'Email',
-                      hint: 'john.doe@example.com',
-                      prefixIcon: Icons.email_outlined,
-                      controller: _emailController,
-                      focusNode: _emailFocus,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) =>
-                          FocusScope.of(context).requestFocus(_passwordFocus),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
-                          return 'Enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // ── Password ────────────────────────────────────────────
-                    AuthTextField(
-                      label: 'Password',
-                      hint: 'Create a password',
-                      prefixIcon: Icons.lock_outline,
-                      controller: _passwordController,
-                      focusNode: _passwordFocus,
-                      obscureText: !_passwordVisible,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _submit(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          size: 18,
+                      const SizedBox(height: 6),
+                      Text(
+                        'Join your team on FieldTrack',
+                        style: AppTextStyles.subtitle.copyWith(
                           color: textSecondary,
                         ),
-                        onPressed: () => setState(
-                          () => _passwordVisible = !_passwordVisible,
-                        ),
                       ),
-                      validator: (v) {
-                        if (v == null || v.isEmpty) {
-                          return 'Password is required';
-                        }
-                        if (v.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
-                    ),
 
-                    const SizedBox(height: 28),
+                      const SizedBox(height: 32),
 
-                    // ── Create account button ───────────────────────────────
-                    BlocBuilder<AuthBloc, AuthState>(
-                      builder: (context, state) {
-                        final isLoading = state is AuthLoading;
-                        return SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : _submit,
-                            child: isLoading
-                                ? const SizedBox(
-                                    height: 22,
-                                    width: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    'Create account',
-                                    style: AppTextStyles.button.copyWith(
-                                      color: isDark
-                                          ? AppColors.onPrimaryDark
-                                          : AppColors.onPrimaryLight,
-                                    ),
-                                  ),
-                          ),
-                        );
-                      },
-                    ),
+                      // ── Full name ───────────────────────────────────────────
+                      AuthTextField(
+                        label: 'Full name',
+                        hint: 'John Doe',
+                        prefixIcon: AppIcon.profileInactive,
+                        controller: _nameController,
+                        focusNode: _nameFocus,
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (_) =>
+                            FocusScope.of(context).requestFocus(_emailFocus),
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return 'Full name is required';
+                          }
+                          if (v.trim().length < 2) {
+                            return 'Name must be at least 2 characters';
+                          }
+                          return null;
+                        },
+                      ),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
-                    // ── Login link ──────────────────────────────────────────
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Already have an account? ',
-                          style: AppTextStyles.subtitle.copyWith(
+                      // ── Email ───────────────────────────────────────────────
+                      AuthTextField(
+                        label: 'Email',
+                        hint: 'john.doe@example.com',
+                        prefixIcon: Icons.email_outlined,
+                        controller: _emailController,
+                        focusNode: _emailFocus,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (_) =>
+                            FocusScope.of(context).requestFocus(_passwordFocus),
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return 'Email is required';
+                          }
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
+                            return 'Enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // ── Password ────────────────────────────────────────────
+                      AuthTextField(
+                        label: 'Password',
+                        hint: 'Create a password',
+                        prefixIcon: Icons.lock_outline,
+                        controller: _passwordController,
+                        focusNode: _passwordFocus,
+                        obscureText: !_passwordVisible,
+                        textInputAction: TextInputAction.done,
+                        onFieldSubmitted: (_) => _submit(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            size: 18,
                             color: textSecondary,
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.pop(),
-                          child: Text(
-                            'Sign in',
-                            style: AppTextStyles.link.copyWith(color: primary),
+                          onPressed: () => setState(
+                            () => _passwordVisible = !_passwordVisible,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                        validator: (v) {
+                          if (v == null || v.isEmpty) {
+                            return 'Password is required';
+                          }
+                          if (v.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      // ── Create account button ───────────────────────────────
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final isLoading = state is AuthLoading;
+                          return SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : _submit,
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Create account',
+                                      style: AppTextStyles.button.copyWith(
+                                        color: isDark
+                                            ? AppColors.onPrimaryDark
+                                            : AppColors.onPrimaryLight,
+                                      ),
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // ── Login link ──────────────────────────────────────────
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Already have an account? ',
+                            style: AppTextStyles.subtitle.copyWith(
+                              color: textSecondary,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => context.pop(),
+                            child: Text(
+                              'Sign in',
+                              style: AppTextStyles.link.copyWith(color: primary),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
             ),

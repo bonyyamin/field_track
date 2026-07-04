@@ -268,179 +268,184 @@ class SettingsPage extends StatelessWidget {
           ),
           body: SafeArea(
             child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Section 1: Appearance & Language ──
-                _buildSectionHeader('Appearance & Language', textColor),
-                const SizedBox(height: 10),
-                _buildCardContainer(
-                  cardBg: cardBg,
-                  borderColor: borderColor,
-                  isDark: isDark,
-                  children: [
-                    _buildTile(
-                      icon: Icons.palette_outlined,
-                      title: 'App Theme',
-                      subtitle: state.themeModeStr,
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      onTap: () => _showThemeSelector(context, state.themeModeStr),
-                    ),
-                    Divider(height: 1, color: borderColor),
-                    _buildTile(
-                      icon: Icons.language_rounded,
-                      title: 'Language',
-                      subtitle: state.settings.language,
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      trailingWidget: _buildComingSoonBadge(isDark),
-                      onTap: () => _showInfoModal(
-                        context,
-                        'Language Selection',
-                        'Multi-language support (Spanish, French, German) is coming soon in a future update!',
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Section 1: Appearance & Language ──
+                      _buildSectionHeader('Appearance & Language', textColor),
+                      const SizedBox(height: 10),
+                      _buildCardContainer(
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        isDark: isDark,
+                        children: [
+                          _buildTile(
+                            icon: Icons.palette_outlined,
+                            title: 'App Theme',
+                            subtitle: state.themeModeStr,
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            onTap: () => _showThemeSelector(context, state.themeModeStr),
+                          ),
+                          Divider(height: 1, color: borderColor),
+                          _buildTile(
+                            icon: Icons.language_rounded,
+                            title: 'Language',
+                            subtitle: state.settings.language,
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            trailingWidget: _buildComingSoonBadge(isDark),
+                            onTap: () => _showInfoModal(
+                              context,
+                              'Language Selection',
+                              'Multi-language support (Spanish, French, German) is coming soon in a future update!',
+                            ),
+                          ),
+                          Divider(height: 1, color: borderColor),
+                          _buildTile(
+                            icon: Icons.map_outlined,
+                            title: 'Default Map Style',
+                            subtitle: state.settings.mapStyle,
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            trailingWidget: _buildComingSoonBadge(isDark),
+                            onTap: () => _showInfoModal(
+                              context,
+                              'Default Map Style',
+                              'Map style customization (Satellite, Terrain, Dark Maps) is coming soon in a future update!',
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Divider(height: 1, color: borderColor),
-                    _buildTile(
-                      icon: Icons.map_outlined,
-                      title: 'Default Map Style',
-                      subtitle: state.settings.mapStyle,
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      trailingWidget: _buildComingSoonBadge(isDark),
-                      onTap: () => _showInfoModal(
-                        context,
-                        'Default Map Style',
-                        'Map style customization (Satellite, Terrain, Dark Maps) is coming soon in a future update!',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                // ── Section 2: Location & Tracking ──
-                _buildSectionHeader('Location & Tracking', textColor),
-                const SizedBox(height: 10),
-                _buildCardContainer(
-                  cardBg: cardBg,
-                  borderColor: borderColor,
-                  isDark: isDark,
-                  children: [
-                    _buildTile(
-                      icon: Icons.gps_fixed_rounded,
-                      title: 'GPS Mode',
-                      subtitle: state.gpsMode,
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      onTap: () => _showGpsModeSelector(context, state.gpsMode),
-                    ),
-                    Divider(height: 1, color: borderColor),
-                    _buildTile(
-                      icon: Icons.radar_rounded,
-                      title: 'Default Geofence Radius',
-                      subtitle: '${state.defaultGeofenceRadius} m',
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      onTap: () => _showGeofenceRadiusSelector(context, state.defaultGeofenceRadius),
-                    ),
-                    Divider(height: 1, color: borderColor),
-                    SwitchListTile(
-                      activeThumbColor: activeColor,
-                      secondary: Icon(Icons.wifi_rounded, color: activeColor, size: 22),
-                      title: Text(
-                        'Auto-Sync on Wi-Fi',
-                        style: AppTextStyles.body.copyWith(
-                          color: textColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      // ── Section 2: Location & Tracking ──
+                      _buildSectionHeader('Location & Tracking', textColor),
+                      const SizedBox(height: 10),
+                      _buildCardContainer(
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        isDark: isDark,
+                        children: [
+                          _buildTile(
+                            icon: Icons.gps_fixed_rounded,
+                            title: 'GPS Mode',
+                            subtitle: state.gpsMode,
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            onTap: () => _showGpsModeSelector(context, state.gpsMode),
+                          ),
+                          Divider(height: 1, color: borderColor),
+                          _buildTile(
+                            icon: Icons.radar_rounded,
+                            title: 'Default Geofence Radius',
+                            subtitle: '${state.defaultGeofenceRadius} m',
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            onTap: () => _showGeofenceRadiusSelector(context, state.defaultGeofenceRadius),
+                          ),
+                          Divider(height: 1, color: borderColor),
+                          SwitchListTile(
+                            activeThumbColor: activeColor,
+                            secondary: Icon(Icons.wifi_rounded, color: activeColor, size: 22),
+                            title: Text(
+                              'Auto-Sync on Wi-Fi',
+                              style: AppTextStyles.body.copyWith(
+                                color: textColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Automatically upload pending logs when connected to Wi-Fi',
+                              style: AppTextStyles.cardSubtitle.copyWith(
+                                color: secondaryTextColor,
+                                fontSize: 12.5,
+                              ),
+                            ),
+                            value: state.autoSyncWifi,
+                            onChanged: (val) => context.read<SettingsCubit>().updateAutoSync(val),
+                          ),
+                          Divider(height: 1, color: borderColor),
+                          SwitchListTile(
+                            activeThumbColor: activeColor,
+                            secondary: Icon(Icons.location_on_outlined, color: activeColor, size: 22),
+                            title: Text(
+                              'Background Location',
+                              style: AppTextStyles.body.copyWith(
+                                color: textColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Allow geofence checks while app is minimized',
+                              style: AppTextStyles.cardSubtitle.copyWith(
+                                color: secondaryTextColor,
+                                fontSize: 12.5,
+                              ),
+                            ),
+                            value: state.backgroundLocationEnabled,
+                            onChanged: (val) => context.read<SettingsCubit>().updateBackgroundLocation(val),
+                          ),
+                        ],
                       ),
-                      subtitle: Text(
-                        'Automatically upload pending logs when connected to Wi-Fi',
-                        style: AppTextStyles.cardSubtitle.copyWith(
-                          color: secondaryTextColor,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      value: state.autoSyncWifi,
-                      onChanged: (val) => context.read<SettingsCubit>().updateAutoSync(val),
-                    ),
-                    Divider(height: 1, color: borderColor),
-                    SwitchListTile(
-                      activeThumbColor: activeColor,
-                      secondary: Icon(Icons.location_on_outlined, color: activeColor, size: 22),
-                      title: Text(
-                        'Background Location',
-                        style: AppTextStyles.body.copyWith(
-                          color: textColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Allow geofence checks while app is minimized',
-                        style: AppTextStyles.cardSubtitle.copyWith(
-                          color: secondaryTextColor,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      value: state.backgroundLocationEnabled,
-                      onChanged: (val) => context.read<SettingsCubit>().updateBackgroundLocation(val),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                // ── Section 3: About & Legal ──
-                _buildSectionHeader('About & Legal', textColor),
-                const SizedBox(height: 10),
-                _buildCardContainer(
-                  cardBg: cardBg,
-                  borderColor: borderColor,
-                  isDark: isDark,
-                  children: [
-                    _buildTile(
-                      icon: Icons.info_outline_rounded,
-                      title: 'Version & Build',
-                      subtitle: 'FieldTrack v1.0.0 (Build 104)',
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      showChevron: false,
-                      onTap: () {},
-                    ),
-                    Divider(height: 1, color: borderColor),
-                    _buildTile(
-                      icon: Icons.description_outlined,
-                      title: 'Terms of Service',
-                      subtitle: 'View software usage terms',
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      onTap: () => _showInfoModal(
-                        context,
-                        'Terms of Service',
-                        'By using FieldTrack, you agree to allow background location updates for geofencing compliance and task management within authorized zones.',
+                      // ── Section 3: About & Legal ──
+                      _buildSectionHeader('About & Legal', textColor),
+                      const SizedBox(height: 10),
+                      _buildCardContainer(
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        isDark: isDark,
+                        children: [
+                          _buildTile(
+                            icon: Icons.info_outline_rounded,
+                            title: 'Version & Build',
+                            subtitle: 'FieldTrack v1.0.0 (Build 104)',
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            showChevron: false,
+                            onTap: () {},
+                          ),
+                          Divider(height: 1, color: borderColor),
+                          _buildTile(
+                            icon: Icons.description_outlined,
+                            title: 'Terms of Service',
+                            subtitle: 'View software usage terms',
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            onTap: () => _showInfoModal(
+                              context,
+                              'Terms of Service',
+                              'By using FieldTrack, you agree to allow background location updates for geofencing compliance and task management within authorized zones.',
+                            ),
+                          ),
+                          Divider(height: 1, color: borderColor),
+                          _buildTile(
+                            icon: Icons.privacy_tip_outlined,
+                            title: 'Privacy Policy',
+                            subtitle: 'View data collection & storage policy',
+                            textColor: textColor,
+                            secondaryTextColor: secondaryTextColor,
+                            onTap: () => _showInfoModal(
+                              context,
+                              'Privacy Policy',
+                              'FieldTrack encrypts offline local storage and only transmits location data during active geofence interactions.',
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Divider(height: 1, color: borderColor),
-                    _buildTile(
-                      icon: Icons.privacy_tip_outlined,
-                      title: 'Privacy Policy',
-                      subtitle: 'View data collection & storage policy',
-                      textColor: textColor,
-                      secondaryTextColor: secondaryTextColor,
-                      onTap: () => _showInfoModal(
-                        context,
-                        'Privacy Policy',
-                        'FieldTrack encrypts offline local storage and only transmits location data during active geofence interactions.',
-                      ),
-                    ),
-                  ],
+                      const SizedBox(height: 28),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 28),
-              ],
+              ),
             ),
           ),
-        ),
         );
       },
     );

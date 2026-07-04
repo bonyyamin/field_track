@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:field_tracker/core/router/route_names.dart';
 import 'package:field_tracker/core/theme/app_colors.dart';
 import 'package:field_tracker/core/theme/app_text_styles.dart';
+import 'package:field_tracker/core/widgets/app_toast.dart';
 import 'package:field_tracker/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:field_tracker/features/auth/presentation/bloc/auth_event.dart';
 import 'package:field_tracker/features/auth/presentation/bloc/auth_state.dart';
@@ -62,20 +63,11 @@ class _LoginPageState extends State<LoginPage> {
         if (state is AuthAuthenticated) {
           context.go(RouteNames.home);
         } else if (state is AuthFailureState) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: isDark
-                    ? AppColors.errorDark
-                    : AppColors.errorLight,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
+          AppToast.show(
+            context,
+            message: state.message,
+            isError: true,
+          );
         }
       },
       child: GestureDetector(
@@ -86,166 +78,170 @@ class _LoginPageState extends State<LoginPage> {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 16),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 450),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 16),
 
-                    // ── Logo ────────────────────────────────────────────────
-                    _AppLogo(primary: primary),
+                      // ── Logo ────────────────────────────────────────────────
+                      _AppLogo(primary: primary),
 
-                    const SizedBox(height: 28),
+                      const SizedBox(height: 28),
 
-                    // ── Heading ─────────────────────────────────────────────
-                    Text(
-                      'Welcome back',
-                      style: AppTextStyles.headingLarge.copyWith(
-                        color: textPrimary,
+                      // ── Heading ─────────────────────────────────────────────
+                      Text(
+                        'Welcome back',
+                        style: AppTextStyles.headingLarge.copyWith(
+                          color: textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Sign in to start your shift',
-                      style: AppTextStyles.subtitle.copyWith(
-                        color: textSecondary,
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // ── Email ───────────────────────────────────────────────
-                    AuthTextField(
-                      label: 'Email',
-                      hint: 'john.doe@example.com',
-                      prefixIcon: Icons.email_outlined,
-                      controller: _emailController,
-                      focusNode: _emailFocus,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) =>
-                          FocusScope.of(context).requestFocus(_passwordFocus),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
-                          return 'Enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // ── Password ────────────────────────────────────────────
-                    AuthTextField(
-                      label: 'Password',
-                      hint: '••••••••',
-                      prefixIcon: Icons.lock_outline,
-                      controller: _passwordController,
-                      focusNode: _passwordFocus,
-                      obscureText: !_passwordVisible,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _submit(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          size: 18,
+                      const SizedBox(height: 6),
+                      Text(
+                        'Sign in to start your shift',
+                        style: AppTextStyles.subtitle.copyWith(
                           color: textSecondary,
                         ),
-                        onPressed: () => setState(
-                          () => _passwordVisible = !_passwordVisible,
-                        ),
                       ),
-                      validator: (v) {
-                        if (v == null || v.isEmpty) {
-                          return 'Password is required';
-                        }
-                        return null;
-                      },
-                    ),
 
-                    // ── Forgot password ─────────────────────────────────────
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          // TODO: navigate to forgot-password screen
+                      const SizedBox(height: 32),
+
+                      // ── Email ───────────────────────────────────────────────
+                      AuthTextField(
+                        label: 'Email',
+                        hint: 'john.doe@example.com',
+                        prefixIcon: Icons.email_outlined,
+                        controller: _emailController,
+                        focusNode: _emailFocus,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (_) =>
+                            FocusScope.of(context).requestFocus(_passwordFocus),
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return 'Email is required';
+                          }
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
+                            return 'Enter a valid email';
+                          }
+                          return null;
                         },
-                        style: TextButton.styleFrom(
-                          foregroundColor: primary,
-                          padding: const EdgeInsets.only(top: 4),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: Text(
-                          'Forgot password?',
-                          style: AppTextStyles.link.copyWith(color: primary),
-                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
-                    // ── Sign in button ──────────────────────────────────────
-                    BlocBuilder<AuthBloc, AuthState>(
-                      builder: (context, state) {
-                        final isLoading = state is AuthLoading;
-                        return SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : _submit,
-                            child: isLoading
-                                ? const SizedBox(
-                                    height: 22,
-                                    width: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    'Sign in',
-                                    style: AppTextStyles.button.copyWith(
-                                      color: isDark
-                                          ? AppColors.onPrimaryDark
-                                          : AppColors.onPrimaryLight,
-                                    ),
-                                  ),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // ── Register link ───────────────────────────────────────
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account? ",
-                          style: AppTextStyles.subtitle.copyWith(
+                      // ── Password ────────────────────────────────────────────
+                      AuthTextField(
+                        label: 'Password',
+                        hint: '••••••••',
+                        prefixIcon: Icons.lock_outline,
+                        controller: _passwordController,
+                        focusNode: _passwordFocus,
+                        obscureText: !_passwordVisible,
+                        textInputAction: TextInputAction.done,
+                        onFieldSubmitted: (_) => _submit(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            size: 18,
                             color: textSecondary,
                           ),
+                          onPressed: () => setState(
+                            () => _passwordVisible = !_passwordVisible,
+                          ),
                         ),
-                        GestureDetector(
-                          onTap: () => context.push(RouteNames.register),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) {
+                            return 'Password is required';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      // ── Forgot password ─────────────────────────────────────
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            // TODO: navigate to forgot-password screen
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: primary,
+                            padding: const EdgeInsets.only(top: 4),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           child: Text(
-                            'Register',
+                            'Forgot password?',
                             style: AppTextStyles.link.copyWith(color: primary),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // ── Sign in button ──────────────────────────────────────
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final isLoading = state is AuthLoading;
+                          return SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : _submit,
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Sign in',
+                                      style: AppTextStyles.button.copyWith(
+                                        color: isDark
+                                            ? AppColors.onPrimaryDark
+                                            : AppColors.onPrimaryLight,
+                                      ),
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // ── Register link ───────────────────────────────────────
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account? ",
+                            style: AppTextStyles.subtitle.copyWith(
+                              color: textSecondary,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => context.push(RouteNames.register),
+                            child: Text(
+                              'Register',
+                              style: AppTextStyles.link.copyWith(color: primary),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
             ),

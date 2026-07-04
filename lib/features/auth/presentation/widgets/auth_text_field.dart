@@ -7,8 +7,8 @@ import 'package:field_tracker/core/theme/app_text_styles.dart';
 /// - Labelled above the field.
 /// - Leading icon in a subtle tint.
 /// - Optional trailing icon (e.g., eye toggle for passwords).
-/// - Inherits InputDecorationTheme from [AppTheme].
-class AuthTextField extends StatefulWidget {
+/// - Shows a thin glowing border when focused (no shadow).
+class AuthTextField extends StatelessWidget {
   final String label;
   final String hint;
   final dynamic prefixIcon; // Can be IconData or String (for asset image)
@@ -37,68 +37,19 @@ class AuthTextField extends StatefulWidget {
   });
 
   @override
-  State<AuthTextField> createState() => _AuthTextFieldState();
-}
-
-class _AuthTextFieldState extends State<AuthTextField> {
-  late FocusNode _focusNode;
-  bool _isFocused = false;
-  bool _hasError = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode = widget.focusNode ?? FocusNode();
-    _focusNode.addListener(_onFocusChange);
-    _isFocused = _focusNode.hasFocus;
-  }
-
-  @override
-  void didUpdateWidget(AuthTextField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.focusNode != oldWidget.focusNode) {
-      _focusNode.removeListener(_onFocusChange);
-      if (oldWidget.focusNode == null) {
-        _focusNode.dispose();
-      }
-      _focusNode = widget.focusNode ?? FocusNode();
-      _focusNode.addListener(_onFocusChange);
-      _isFocused = _focusNode.hasFocus;
-    }
-  }
-
-  void _onFocusChange() {
-    setState(() {
-      _isFocused = _focusNode.hasFocus;
-    });
-  }
-
-  @override
-  void dispose() {
-    if (widget.focusNode == null) {
-      _focusNode.dispose();
-    } else {
-      _focusNode.removeListener(_onFocusChange);
-    }
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondaryLight;
-    final primaryColor = isDark
-        ? AppColors.primaryDark
-        : AppColors.primaryLight;
-    final errorColor = isDark ? AppColors.errorDark : AppColors.errorLight;
+
+    const glowColor = AppColors.primaryLight;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.label,
+          label,
           style: AppTextStyles.fieldLabel.copyWith(
             color: isDark
                 ? AppColors.textSecondaryDark
@@ -106,68 +57,109 @@ class _AuthTextFieldState extends State<AuthTextField> {
           ),
         ),
         const SizedBox(height: 6),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              if (_isFocused)
-                BoxShadow(
-                  color: (_hasError ? errorColor : primaryColor).withValues(
-                    alpha: 0.2,
-                  ),
-                  blurRadius: 8.0,
-                  spreadRadius: 2.0,
-                ),
-            ],
+        TextFormField(
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: keyboardType,
+          obscureText: obscureText,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
+          style: AppTextStyles.inputText.copyWith(
+            color: isDark
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimaryLight,
           ),
-          child: TextFormField(
-            controller: widget.controller,
-            focusNode: _focusNode,
-            keyboardType: widget.keyboardType,
-            obscureText: widget.obscureText,
-            textInputAction: widget.textInputAction,
-            onFieldSubmitted: widget.onFieldSubmitted,
-            style: AppTextStyles.inputText.copyWith(
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimaryLight,
-            ),
-            validator: (value) {
-              if (widget.validator != null) {
-                final error = widget.validator!(value);
-                final hasError = error != null;
-                if (_hasError != hasError) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      setState(() {
-                        _hasError = hasError;
-                      });
-                    }
-                  });
-                }
-                return error;
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-              hintText: widget.hint,
-              prefixIcon: widget.prefixIcon is IconData
-                  ? Icon(widget.prefixIcon as IconData, size: 18, color: iconColor)
-                  : Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Image.asset(
-                        widget.prefixIcon as String,
-                        width: 18,
-                        height: 18,
-                        color: iconColor,
-                      ),
+          validator: validator,
+          decoration: InputDecoration(
+            hintText: hint,
+            // Use a custom InputBorder that draws the glow effect.
+            // Flutter paints InputBorder ONLY around the input box —
+            // never around the error text below it.
+            focusedBorder: const _GlowInputBorder(color: glowColor),
+            focusedErrorBorder: const _GlowInputBorder(color: glowColor),
+            prefixIcon: prefixIcon is IconData
+                ? Icon(prefixIcon as IconData, size: 18, color: iconColor)
+                : Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Image.asset(
+                      prefixIcon as String,
+                      width: 18,
+                      height: 18,
+                      color: iconColor,
                     ),
-              suffixIcon: widget.suffixIcon,
-            ),
+                  ),
+            suffixIcon: suffixIcon,
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Custom [InputBorder] that renders a thin glowing stroke.
+///
+/// Because Flutter paints [InputBorder] only around the input box itself
+/// (never around the helper/error text), this approach avoids the
+/// double-border and misplaced-border issues that wrapping containers cause.
+class _GlowInputBorder extends InputBorder {
+  final Color color;
+
+  const _GlowInputBorder({required this.color})
+      : super(borderSide: BorderSide.none);
+
+  static const _radius = Radius.circular(10);
+
+  @override
+  bool get isOutline => true;
+
+  @override
+  EdgeInsetsGeometry get dimensions => const EdgeInsets.all(1.5);
+
+  @override
+  _GlowInputBorder copyWith({BorderSide? borderSide}) => this;
+
+  @override
+  ShapeBorder scale(double t) => this;
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
+      Path()..addRRect(RRect.fromRectAndRadius(rect, _radius));
+
+  @override
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) =>
+      Path()..addRRect(RRect.fromRectAndRadius(rect, _radius));
+
+  @override
+  void paint(
+    Canvas canvas,
+    Rect rect, {
+    double? gapStart,
+    double gapExtent = 0.0,
+    double gapPercentage = 0.0,
+    TextDirection? textDirection,
+  }) {
+    final rrect = RRect.fromRectAndRadius(
+      rect.deflate(0.75),
+      _radius,
+    );
+
+    // Soft glow — blur applied only to the stroke, not a filled shadow.
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = color.withOpacity(0.4)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.5),
+    );
+
+    // Crisp solid border line on top.
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
     );
   }
 }

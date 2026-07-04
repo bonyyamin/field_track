@@ -7,6 +7,7 @@ import 'package:field_tracker/core/theme/app_text_styles.dart';
 import 'package:field_tracker/core/widgets/app_button.dart';
 import 'package:field_tracker/core/widgets/error_view.dart';
 import 'package:field_tracker/core/widgets/loading_indicator.dart';
+import 'package:field_tracker/core/widgets/app_toast.dart';
 import 'package:field_tracker/core/constants/app_icon.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
@@ -93,12 +94,10 @@ class ProfilePage extends StatelessWidget {
         child: BlocConsumer<ProfileBloc, ProfileState>(
           listener: (context, state) {
             if (state is ProfileError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: errorColor,
-                  behavior: SnackBarBehavior.floating,
-                ),
+              AppToast.show(
+                context,
+                message: state.message,
+                isError: true,
               );
             } else if (state is ProfileSignedOut) {
               context.go(RouteNames.login);
@@ -123,115 +122,118 @@ class ProfilePage extends StatelessWidget {
                 },
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Screen Title Header
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20, top: 4),
-                        child: Text(
-                          'Profile',
-                          style: AppTextStyles.headingLarge.copyWith(
-                            color: textColor,
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      // Profile User Card Header
-                      ProfileHeader(user: state.user),
-                      const SizedBox(height: 16),
-
-                      // Quick Stats Row
-                      Row(
+                  child: Center(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 550),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: StatChip(
-                              value: '${state.stats.completedTasks}/${state.stats.totalTasks}',
-                              label: 'Tasks done today',
+                          // Screen Title Header
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20, top: 4),
+                            child: Text(
+                              'Profile',
+                              style: AppTextStyles.headingLarge.copyWith(
+                                color: textColor,
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: StatChip(
-                              value: '${state.stats.activeLocationsCount}',
-                              label: 'Active locations',
+
+                          // Profile User Card Header
+                          ProfileHeader(user: state.user),
+                          const SizedBox(height: 16),
+
+                          // Quick Stats Row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: StatChip(
+                                  value: '${state.stats.completedTasks}/${state.stats.totalTasks}',
+                                  label: 'Tasks done today',
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: StatChip(
+                                  value: '${state.stats.activeLocationsCount}',
+                                  label: 'Active locations',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Account Settings Menu Card
+                          Container(
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: borderColor, width: 1),
+                              boxShadow: isDark
+                                  ? []
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.02),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                            ),
+                            child: Column(
+                              children: [
+                                ProfileMenuTile(
+                                  icon: AppIcon.profileInactive,
+                                  label: 'Edit profile',
+                                  onTap: () {
+                                    AppToast.show(
+                                      context,
+                                      message: 'Coming soon',
+                                    );
+                                  },
+                                ),
+                                ProfileMenuTile(
+                                  icon: Icons.notifications_none_rounded,
+                                  label: 'Notifications',
+                                  onTap: () => context.push(RouteNames.notifications),
+                                ),
+                                ProfileMenuTile(
+                                  icon: Icons.settings_outlined,
+                                  label: 'Settings',
+                                  onTap: () => context.push(RouteNames.settings),
+                                ),
+                                ProfileMenuTile(
+                                  icon: Icons.help_outline_rounded,
+                                  label: 'Help & support',
+                                  onTap: () => context.push(RouteNames.helpSupport),
+                                  showDivider: false,
+                                ),
+                              ],
                             ),
                           ),
+                          const SizedBox(height: 24),
+
+                          // Sign Out Button
+                          AppButton.outline(
+                            label: 'Sign out',
+                            height: 50,
+                            borderRadius: BorderRadius.circular(28),
+                            icon: Icon(
+                              Icons.logout_rounded,
+                              size: 20,
+                              color: errorColor,
+                            ),
+                            textColor: errorColor,
+                            borderColor: errorColor,
+                            onPressed: () => _showSignOutDialog(context),
+                          ),
+
+                          const SizedBox(height: 24),
                         ],
                       ),
-                      const SizedBox(height: 16),
-
-                      // Account Settings Menu Card
-                      Container(
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: borderColor, width: 1),
-                          boxShadow: isDark
-                              ? []
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.02),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                        ),
-                        child: Column(
-                          children: [
-                            ProfileMenuTile(
-                              icon: AppIcon.profileInactive,
-                              label: 'Edit profile',
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Coming soon'),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
-                            ),
-                            ProfileMenuTile(
-                              icon: Icons.notifications_none_rounded,
-                              label: 'Notifications',
-                              onTap: () => context.push(RouteNames.notifications),
-                            ),
-                            ProfileMenuTile(
-                              icon: Icons.settings_outlined,
-                              label: 'Settings',
-                              onTap: () => context.push(RouteNames.settings),
-                            ),
-                            ProfileMenuTile(
-                              icon: Icons.help_outline_rounded,
-                              label: 'Help & support',
-                              onTap: () => context.push(RouteNames.helpSupport),
-                              showDivider: false,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Sign Out Button
-                      AppButton.outline(
-                        label: 'Sign out',
-                        height: 50,
-                        borderRadius: BorderRadius.circular(28),
-                        icon: Icon(
-                          Icons.logout_rounded,
-                          size: 20,
-                          color: errorColor,
-                        ),
-                        textColor: errorColor,
-                        borderColor: errorColor,
-                        onPressed: () => _showSignOutDialog(context),
-                      ),
-
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   ),
                 ),
               );

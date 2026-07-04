@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:field_tracker/core/constants/app_icon.dart';
 import 'package:field_tracker/core/theme/app_colors.dart';
 import 'package:field_tracker/core/theme/app_text_styles.dart';
+import 'package:field_tracker/core/widgets/app_toast.dart';
 import '../../domain/entities/location_entity.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
@@ -145,237 +146,239 @@ class _EditLocationPageState extends State<EditLocationPage> {
         child: BlocListener<LocationBloc, LocationState>(
         listener: (context, state) {
           if (state is LocationSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: primaryColor,
-              ),
+            AppToast.show(
+              context,
+              message: state.message,
             );
             context.pop();
           } else if (state is LocationError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: errorColor,
-              ),
+            AppToast.show(
+              context,
+              message: state.message,
+              isError: true,
             );
           }
         },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Map Preview Widget
-                MapPlaceholderWidget(radiusM: _radiusM),
-                const SizedBox(height: 20),
-                // Location Name Field
-                Text(
-                  'Location name',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: labelColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _nameController,
-                  style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
-                  validator: (value) =>
-                      value == null || value.trim().isEmpty ? 'Please enter location name' : null,
-                  decoration: _inputDecoration(
-                    hintText: 'e.g. Downtown Branch',
-                    inputBg: inputBg,
-                    borderColor: borderColor,
-                    labelColor: labelColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Latitude & Longitude Side-by-Side
-                Row(
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 500),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Latitude',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: labelColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            controller: _latController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                              signed: true,
-                            ),
-                            style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
-                            validator: (value) =>
-                                value == null || value.trim().isEmpty ? 'Required' : null,
-                            decoration: _inputDecoration(
-                              hintText: '25.2048',
-                              inputBg: inputBg,
-                              borderColor: borderColor,
-                              labelColor: labelColor,
-                            ),
-                          ),
-                        ],
+                    // Map Preview Widget
+                    MapPlaceholderWidget(radiusM: _radiusM),
+                    const SizedBox(height: 20),
+                    // Location Name Field
+                    Text(
+                      'Location name',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: labelColor,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Longitude',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: labelColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            controller: _lngController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                              signed: true,
-                            ),
-                            style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
-                            validator: (value) =>
-                                value == null || value.trim().isEmpty ? 'Required' : null,
-                            decoration: _inputDecoration(
-                              hintText: '55.2708',
-                              inputBg: inputBg,
-                              borderColor: borderColor,
-                              labelColor: labelColor,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameController,
+                      style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty ? 'Please enter location name' : null,
+                      decoration: _inputDecoration(
+                        hintText: 'e.g. Downtown Branch',
+                        inputBg: inputBg,
+                        borderColor: borderColor,
+                        labelColor: labelColor,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                // Geofence Radius Slider Section
-                GeofenceRadiusSlider(
-                  radiusM: _radiusM,
-                  onChanged: (val) {
-                    setState(() => _radiusM = val);
-                  },
-                ),
-                const SizedBox(height: 20),
-                // Active Switch Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 16),
+                    // Latitude & Longitude Side-by-Side
+                    Row(
                       children: [
-                        Text(
-                          'Active',
-                          style: AppTextStyles.h4.copyWith(
-                            color: titleColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Latitude',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: labelColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: _latController,
+                                keyboardType: const TextInputType.numberWithOptions(
+                                  decimal: true,
+                                  signed: true,
+                                ),
+                                style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty ? 'Required' : null,
+                                decoration: _inputDecoration(
+                                  hintText: '25.2048',
+                                  inputBg: inputBg,
+                                  borderColor: borderColor,
+                                  labelColor: labelColor,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Workers can check in here',
-                          style: AppTextStyles.bodySmall.copyWith(color: labelColor),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Longitude',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: labelColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: _lngController,
+                                keyboardType: const TextInputType.numberWithOptions(
+                                  decimal: true,
+                                  signed: true,
+                                ),
+                                style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty ? 'Required' : null,
+                                decoration: _inputDecoration(
+                                  hintText: '55.2708',
+                                  inputBg: inputBg,
+                                  borderColor: borderColor,
+                                  labelColor: labelColor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    Switch(
-                      value: _isActive,
-                      activeThumbColor: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
-                      activeTrackColor: primaryColor,
+                    const SizedBox(height: 24),
+                    // Geofence Radius Slider Section
+                    GeofenceRadiusSlider(
+                      radiusM: _radiusM,
                       onChanged: (val) {
-                        setState(() => _isActive = val);
+                        setState(() => _radiusM = val);
                       },
                     ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                // Action Buttons: Update Location & Delete Location
-                BlocBuilder<LocationBloc, LocationState>(
-                  builder: (context, state) {
-                    final isSubmitting = state is LocationSubmitting;
-
-                    return Column(
+                    const SizedBox(height: 20),
+                    // Active Switch Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Update Location Button (Primary filled)
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: isSubmitting ? null : _onUpdateLocation,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14.0),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: isSubmitting
-                                ? SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: isDark
-                                          ? AppColors.onPrimaryDark
-                                          : AppColors.onPrimaryLight,
-                                    ),
-                                  )
-                                : Text(
-                                    'Update location',
-                                    style: AppTextStyles.button.copyWith(
-                                      color: isDark
-                                          ? AppColors.onPrimaryDark
-                                          : AppColors.onPrimaryLight,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        // Delete Location Button (Red Outlined Danger Button)
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: OutlinedButton.icon(
-                            onPressed: isSubmitting ? null : _onConfirmDelete,
-                            icon: Image.asset(AppIcon.trash, width: 20, height: 20, color: errorColor),
-                            label: Text(
-                              'Delete location',
-                              style: AppTextStyles.button.copyWith(
-                                color: errorColor,
-                                fontWeight: FontWeight.bold,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Active',
+                              style: AppTextStyles.h4.copyWith(
+                                color: titleColor,
                                 fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: errorColor, width: 1.5),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14.0),
-                              ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Workers can check in here',
+                              style: AppTextStyles.bodySmall.copyWith(color: labelColor),
                             ),
-                          ),
+                          ],
+                        ),
+                        Switch(
+                          value: _isActive,
+                          activeThumbColor: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
+                          activeTrackColor: primaryColor,
+                          onChanged: (val) {
+                            setState(() => _isActive = val);
+                          },
                         ),
                       ],
-                    );
-                  },
+                    ),
+                    const SizedBox(height: 32),
+                    // Action Buttons: Update Location & Delete Location
+                    BlocBuilder<LocationBloc, LocationState>(
+                      builder: (context, state) {
+                        final isSubmitting = state is LocationSubmitting;
+
+                        return Column(
+                          children: [
+                            // Update Location Button (Primary filled)
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: ElevatedButton(
+                                onPressed: isSubmitting ? null : _onUpdateLocation,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.0),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: isSubmitting
+                                    ? SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: isDark
+                                              ? AppColors.onPrimaryDark
+                                              : AppColors.onPrimaryLight,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Update location',
+                                        style: AppTextStyles.button.copyWith(
+                                          color: isDark
+                                              ? AppColors.onPrimaryDark
+                                              : AppColors.onPrimaryLight,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            // Delete Location Button (Red Outlined Danger Button)
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: OutlinedButton.icon(
+                                onPressed: isSubmitting ? null : _onConfirmDelete,
+                                icon: Image.asset(AppIcon.trash, width: 20, height: 20, color: errorColor),
+                                label: Text(
+                                  'Delete location',
+                                  style: AppTextStyles.button.copyWith(
+                                    color: errorColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: errorColor, width: 1.5),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:field_tracker/core/theme/app_colors.dart';
 import 'package:field_tracker/core/theme/app_text_styles.dart';
+import 'package:field_tracker/core/widgets/app_toast.dart';
 import '../bloc/sync_bloc.dart';
 import '../bloc/sync_event.dart';
 import '../bloc/sync_state.dart';
@@ -41,83 +42,152 @@ class SyncPage extends StatelessWidget {
       body: BlocConsumer<SyncBloc, SyncState>(
         listener: (context, state) {
           if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: AppColors.errorLight,
-                behavior: SnackBarBehavior.floating,
-              ),
+            AppToast.show(
+              context,
+              message: state.errorMessage!,
+              isError: true,
             );
           } else if (state.successMessage != null && state.successMessage!.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.successMessage!),
-                backgroundColor: successColor,
-                behavior: SnackBarBehavior.floating,
-              ),
+            AppToast.show(
+              context,
+              message: state.successMessage!,
             );
           }
         },
         builder: (context, state) {
           return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Offline Status Banner if device is offline
-                  if (state.isOffline) const OfflineStatusCard(),
+            child: Center(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final useScrollableLayout = constraints.maxHeight < 500;
 
-                  // Pending summary card (3 changes pending / Last synced today...)
-                  PendingSummaryCard(
-                    count: state.pendingChanges.length,
-                    lastSyncedAt: state.lastSyncedAt,
-                  ),
+                    if (useScrollableLayout) {
+                      return SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Offline Status Banner if device is offline
+                            if (state.isOffline) const OfflineStatusCard(),
 
-                  // Section Title: WAITING TO UPLOAD
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      'WAITING TO UPLOAD',
-                      style: AppTextStyles.fieldLabel.copyWith(
-                        color: textSecondary,
-                        letterSpacing: 1.1,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
+                            // Pending summary card (3 changes pending / Last synced today...)
+                            PendingSummaryCard(
+                              count: state.pendingChanges.length,
+                              lastSyncedAt: state.lastSyncedAt,
+                            ),
 
-                  // Pending Changes List
-                  Expanded(
-                    child: state.pendingChanges.isEmpty
-                        ? _buildEmptyState(context, isDark, textSecondary, successColor)
-                        : ListView.builder(
-                            itemCount: state.pendingChanges.length,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              final item = state.pendingChanges[index];
-                              return PendingChangeTile(item: item);
-                            },
+                            // Section Title: WAITING TO UPLOAD
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Text(
+                                'WAITING TO UPLOAD',
+                                style: AppTextStyles.fieldLabel.copyWith(
+                                  color: textSecondary,
+                                  letterSpacing: 1.1,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+
+                            // Pending Changes List
+                            if (state.pendingChanges.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 24),
+                                child: _buildEmptyState(context, isDark, textSecondary, successColor),
+                              )
+                            else
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: state.pendingChanges.length,
+                                itemBuilder: (context, index) {
+                                  final item = state.pendingChanges[index];
+                                  return PendingChangeTile(item: item);
+                                },
+                              ),
+
+                            const SizedBox(height: 24),
+
+                            // Sync Now Action Button
+                            SyncNowButton(
+                              isLoading: state.isSyncing,
+                              enabled: !state.isSyncing,
+                              onPressed: () {
+                                context.read<SyncBloc>().add(const ManualSyncRequested());
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Offline Status Banner if device is offline
+                          if (state.isOffline) const OfflineStatusCard(),
+
+                          // Pending summary card (3 changes pending / Last synced today...)
+                          PendingSummaryCard(
+                            count: state.pendingChanges.length,
+                            lastSyncedAt: state.lastSyncedAt,
                           ),
-                  ),
 
-                  const SizedBox(height: 12),
+                          // Section Title: WAITING TO UPLOAD
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Text(
+                              'WAITING TO UPLOAD',
+                              style: AppTextStyles.fieldLabel.copyWith(
+                                color: textSecondary,
+                                letterSpacing: 1.1,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
 
-                  // Sync Now Action Button
-                  SyncNowButton(
-                    isLoading: state.isSyncing,
-                    enabled: !state.isSyncing,
-                    onPressed: () {
-                      context.read<SyncBloc>().add(const ManualSyncRequested());
+                            // Pending Changes List
+                            Expanded(
+                              child: state.pendingChanges.isEmpty
+                                  ? _buildEmptyState(context, isDark, textSecondary, successColor)
+                                  : ListView.builder(
+                                      itemCount: state.pendingChanges.length,
+                                      physics: const BouncingScrollPhysics(),
+                                      itemBuilder: (context, index) {
+                                        final item = state.pendingChanges[index];
+                                        return PendingChangeTile(item: item);
+                                      },
+                                    ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // Sync Now Action Button
+                            SyncNowButton(
+                              isLoading: state.isSyncing,
+                              enabled: !state.isSyncing,
+                              onPressed: () {
+                                context.read<SyncBloc>().add(const ManualSyncRequested());
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      );
                     },
                   ),
-                  const SizedBox(height: 8),
-                ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
       ),
     );
   }

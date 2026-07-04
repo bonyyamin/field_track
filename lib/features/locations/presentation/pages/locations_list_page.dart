@@ -47,130 +47,87 @@ class _LocationsListPageState extends State<LocationsListPage> {
     return Scaffold(
       backgroundColor: scaffoldBg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              // Top Header Row: "Locations" title + '+' button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Locations',
-                    style: AppTextStyles.h1.copyWith(
-                      color: titleColor,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: IconButton(
-                      onPressed: _navigateToAddLocation,
-                      icon: Icon(
-                        Icons.add,
-                        color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 600),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                // Top Header Row: "Locations" title + '+' button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Locations',
+                      style: AppTextStyles.h1.copyWith(
+                        color: titleColor,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              // Search Bar
-              LocationSearchBar(
-                controller: _searchController,
-                onChanged: (query) {
-                  context.read<LocationBloc>().add(SearchLocations(query));
-                },
-              ),
-              const SizedBox(height: 20),
-              // Locations List Content
-              Expanded(
-                child: BlocBuilder<LocationBloc, LocationState>(
-                  builder: (context, state) {
-                    if (state is LocationLoading) {
-                      return Center(
-                        child: CircularProgressIndicator(color: primaryColor),
-                      );
-                    }
-
-                    if (state is LocationError) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.error_outline, size: 48, color: isDark ? AppColors.errorDark : AppColors.errorLight),
-                            const SizedBox(height: 12),
-                            Text(
-                              state.message,
-                              style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                context.read<LocationBloc>().add(const LoadLocations());
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                              ),
-                              child: Text(
-                                'Retry',
-                                style: TextStyle(
-                                  color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
-                                ),
-                              ),
-                            ),
-                          ],
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: IconButton(
+                        onPressed: _navigateToAddLocation,
+                        icon: Icon(
+                          Icons.add,
+                          color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
                         ),
-                      );
-                    }
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Search Bar
+                LocationSearchBar(
+                  controller: _searchController,
+                  onChanged: (query) {
+                    context.read<LocationBloc>().add(SearchLocations(query));
+                  },
+                ),
+                const SizedBox(height: 20),
+                // Locations List Content
+                Expanded(
+                  child: BlocBuilder<LocationBloc, LocationState>(
+                    builder: (context, state) {
+                      if (state is LocationLoading) {
+                        return Center(
+                          child: CircularProgressIndicator(color: primaryColor),
+                        );
+                      }
 
-                    if (state is LocationLoaded) {
-                      final locations = state.filteredLocations;
-
-                      if (locations.isEmpty) {
-                        return RefreshIndicator(
-                          onRefresh: () async {
-                            context.read<LocationBloc>().add(const LoadLocations());
-                          },
-                          color: primaryColor,
-                          child: ListView(
-                            physics: const AlwaysScrollableScrollPhysics(),
+                      if (state is LocationError) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const SizedBox(height: 80),
-                              Center(
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.location_off_outlined,
-                                      size: 56,
-                                      color: subtitleColor,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      state.searchQuery.isNotEmpty
-                                          ? 'No locations match "${state.searchQuery}"'
-                                          : 'No locations added yet',
-                                      style: AppTextStyles.h4.copyWith(color: titleColor),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      state.searchQuery.isNotEmpty
-                                          ? 'Try searching with a different keyword'
-                                          : 'Tap the + button to add your first geofence location',
-                                      style: AppTextStyles.bodySmall.copyWith(color: subtitleColor),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
+                              Icon(Icons.error_outline, size: 48, color: isDark ? AppColors.errorDark : AppColors.errorLight),
+                              const SizedBox(height: 12),
+                              Text(
+                                state.message,
+                                style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  context.read<LocationBloc>().add(const LoadLocations());
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                ),
+                                child: Text(
+                                  'Retry',
+                                  style: TextStyle(
+                                    color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
+                                  ),
                                 ),
                               ),
                             ],
@@ -178,35 +135,81 @@ class _LocationsListPageState extends State<LocationsListPage> {
                         );
                       }
 
-                      return RefreshIndicator(
-                        onRefresh: () async {
-                          context.read<LocationBloc>().add(const LoadLocations());
-                        },
-                        color: primaryColor,
-                        child: ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: locations.length,
-                          itemBuilder: (context, index) {
-                            final loc = locations[index];
-                            return LocationCard(
-                              location: loc,
-                              onTap: () {
-                                context.push(
-                                  RouteNames.editLocationPath(loc.id),
-                                  extra: loc,
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      );
-                    }
+                      if (state is LocationLoaded) {
+                        final locations = state.filteredLocations;
 
-                    return const SizedBox.shrink();
-                  },
+                        if (locations.isEmpty) {
+                          return RefreshIndicator(
+                            onRefresh: () async {
+                              context.read<LocationBloc>().add(const LoadLocations());
+                            },
+                            color: primaryColor,
+                            child: ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                const SizedBox(height: 80),
+                                Center(
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.location_off_outlined,
+                                        size: 56,
+                                        color: subtitleColor,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        state.searchQuery.isNotEmpty
+                                            ? 'No locations match "${state.searchQuery}"'
+                                            : 'No locations added yet',
+                                        style: AppTextStyles.h4.copyWith(color: titleColor),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        state.searchQuery.isNotEmpty
+                                            ? 'Try searching with a different keyword'
+                                            : 'Tap the + button to add your first geofence location',
+                                        style: AppTextStyles.bodySmall.copyWith(color: subtitleColor),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            context.read<LocationBloc>().add(const LoadLocations());
+                          },
+                          color: primaryColor,
+                          child: ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: locations.length,
+                            itemBuilder: (context, index) {
+                              final loc = locations[index];
+                              return LocationCard(
+                                location: loc,
+                                onTap: () {
+                                  context.push(
+                                    RouteNames.editLocationPath(loc.id),
+                                    extra: loc,
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        );
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

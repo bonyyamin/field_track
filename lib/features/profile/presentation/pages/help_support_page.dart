@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:field_tracker/core/theme/app_colors.dart';
 import 'package:field_tracker/core/theme/app_text_styles.dart';
+import 'package:field_tracker/core/widgets/app_toast.dart';
 
 /// Help & Support screen containing contact cards, FAQs, issue reporting, and system health status.
 class HelpSupportPage extends StatefulWidget {
@@ -61,115 +62,114 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 20,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: borderColor,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Report Issue / Feedback',
-                style: AppTextStyles.headingMedium.copyWith(
-                  color: textColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Our support team responds within 24 hours.',
-                style: AppTextStyles.cardSubtitle.copyWith(
-                  color: secondaryTextColor,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Issue Category Selector
-              Text('Category', style: AppTextStyles.fieldLabel.copyWith(color: textColor)),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<String>(
-                initialValue: selectedCategory,
-                dropdownColor: cardBg,
-                style: AppTextStyles.body.copyWith(color: textColor),
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: activeColor)),
-                ),
-                items: ['Bug Report', 'Geofence Error', 'Feature Request', 'General Query'].map((cat) {
-                  return DropdownMenuItem(value: cat, child: Text(cat));
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) setModalState(() => selectedCategory = val);
-                },
-              ),
-              const SizedBox(height: 14),
-
-              // Description text field
-              Text('Description', style: AppTextStyles.fieldLabel.copyWith(color: textColor)),
-              const SizedBox(height: 6),
-              TextField(
-                controller: controller,
-                maxLines: 4,
-                style: AppTextStyles.inputText.copyWith(color: textColor),
-                decoration: InputDecoration(
-                  hintText: 'Describe the issue or feedback in detail...',
-                  hintStyle: AppTextStyles.cardSubtitle.copyWith(color: secondaryTextColor),
-                  contentPadding: const EdgeInsets.all(14),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: activeColor)),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Submit Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: activeColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Thank you! Your ticket has been submitted.'),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'Submit Ticket',
-                    style: AppTextStyles.button.copyWith(
-                      color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
-                      fontWeight: FontWeight.bold,
+        builder: (context, setModalState) => SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 20,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: borderColor,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Text(
+                  'Report Issue / Feedback',
+                  style: AppTextStyles.headingMedium.copyWith(
+                    color: textColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Our support team responds within 24 hours.',
+                  style: AppTextStyles.cardSubtitle.copyWith(
+                    color: secondaryTextColor,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 18),
+
+                // Issue Category Selector
+                Text('Category', style: AppTextStyles.fieldLabel.copyWith(color: textColor)),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<String>(
+                  initialValue: selectedCategory,
+                  dropdownColor: cardBg,
+                  style: AppTextStyles.body.copyWith(color: textColor),
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: activeColor)),
+                  ),
+                  items: ['Bug Report', 'Geofence Error', 'Feature Request', 'General Query'].map((cat) {
+                    return DropdownMenuItem(value: cat, child: Text(cat));
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) setModalState(() => selectedCategory = val);
+                  },
+                ),
+                const SizedBox(height: 14),
+
+                // Description text field
+                Text('Description', style: AppTextStyles.fieldLabel.copyWith(color: textColor)),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: controller,
+                  maxLines: 4,
+                  style: AppTextStyles.inputText.copyWith(color: textColor),
+                  decoration: InputDecoration(
+                    hintText: 'Describe the issue or feedback in detail...',
+                    hintStyle: AppTextStyles.cardSubtitle.copyWith(color: secondaryTextColor),
+                    contentPadding: const EdgeInsets.all(14),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: activeColor)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: activeColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      AppToast.show(
+                        context,
+                        message: 'Thank you! Your ticket has been submitted.',
+                      );
+                    },
+                    child: Text(
+                      'Submit Ticket',
+                      style: AppTextStyles.button.copyWith(
+                        color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -177,13 +177,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
   }
 
   void _showContactSnackBar(String channel) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening $channel...'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
+    AppToast.show(
+      context,
+      message: 'Opening $channel...',
     );
   }
 
@@ -199,7 +195,6 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
     final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
     final activeColor = isDark ? AppColors.primaryDark : AppColors.primaryLight;
     final successColor = isDark ? AppColors.successTextDark : AppColors.successTextLight;
-    final successBg = isDark ? AppColors.successBgDark : AppColors.successBgLight;
 
     return Scaffold(
       backgroundColor: bg,
@@ -226,239 +221,242 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── System Status Banner Card ──
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: borderColor, width: 1),
-                boxShadow: isDark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-              ),
-              child: Row(
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 600),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ── System Status Banner Card ──
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: successBg,
-                      borderRadius: BorderRadius.circular(10),
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: borderColor, width: 1),
+                      boxShadow: isDark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
                     ),
-                    child: Icon(Icons.check_circle_rounded, color: successColor, size: 24),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Text(
-                          'All Systems Operational',
-                          style: AppTextStyles.cardTitle.copyWith(
-                            color: textColor,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: successColor,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'API, Geofence Engine & Sync are online',
-                          style: AppTextStyles.cardSubtitle.copyWith(
-                            color: secondaryTextColor,
-                            fontSize: 12.5,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'All Geofence Tracking Systems Operational',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: textColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.5,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-            // ── Section 1: Contact Support ──
-            Text(
-              'Contact Support',
-              style: AppTextStyles.cardTitle.copyWith(
-                color: textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildContactActionCard(
-                    icon: Icons.email_outlined,
-                    label: 'Email Support',
-                    subtitle: 'Response in 24h',
-                    color: activeColor,
-                    cardBg: cardBg,
-                    borderColor: borderColor,
-                    textColor: textColor,
-                    secondaryTextColor: secondaryTextColor,
-                    onTap: () => _showContactSnackBar('Email Client (support@fieldtrack.io)'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildContactActionCard(
-                    icon: Icons.headset_mic_outlined,
-                    label: 'Call Helpline',
-                    subtitle: 'Toll-free 24/7',
-                    color: activeColor,
-                    cardBg: cardBg,
-                    borderColor: borderColor,
-                    textColor: textColor,
-                    secondaryTextColor: secondaryTextColor,
-                    onTap: () => _showContactSnackBar('Phone Dialer (+1 800 555-0199)'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // ── Section 2: Report an Issue ──
-            Text(
-              'Need Assistance?',
-              style: AppTextStyles.cardTitle.copyWith(
-                color: textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: borderColor, width: 1),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.bug_report_outlined, color: activeColor, size: 28),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Submit Feedback or Report Bug',
-                          style: AppTextStyles.cardTitle.copyWith(
-                            color: textColor,
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          'Send logs and issue details directly to engineers',
-                          style: AppTextStyles.cardSubtitle.copyWith(
-                            color: secondaryTextColor,
-                            fontSize: 12.5,
-                          ),
-                        ),
-                      ],
+                  // ── Section 1: Contact Support ──
+                  Text(
+                    'Contact Support',
+                    style: AppTextStyles.cardTitle.copyWith(
+                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: activeColor,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildContactActionCard(
+                          icon: Icons.chat_bubble_outline_rounded,
+                          label: 'Chat Support',
+                          subtitle: 'Chat live with an agent',
+                          color: activeColor,
+                          cardBg: cardBg,
+                          borderColor: borderColor,
+                          textColor: textColor,
+                          secondaryTextColor: secondaryTextColor,
+                          onTap: () => _showContactSnackBar('Live Chat'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildContactActionCard(
+                          icon: Icons.mail_outline_rounded,
+                          label: 'Email Support',
+                          subtitle: 'Get answers in 24h',
+                          color: activeColor,
+                          cardBg: cardBg,
+                          borderColor: borderColor,
+                          textColor: textColor,
+                          secondaryTextColor: secondaryTextColor,
+                          onTap: () => _showContactSnackBar('Email Client'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Section 2: Submit Ticket / Feedback ──
+                  Text(
+                    'Submit Ticket / Feedback',
+                    style: AppTextStyles.cardTitle.copyWith(
+                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
                     ),
-                    onPressed: _showFeedbackModal,
-                    child: Text(
-                      'Report',
-                      style: AppTextStyles.button.copyWith(
-                        color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
-                        fontSize: 13,
+                  ),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: _showFeedbackModal,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: borderColor, width: 1),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: activeColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(Icons.bug_report_outlined, color: activeColor, size: 22),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Submit Feedback or Report Bug',
+                                  style: AppTextStyles.cardTitle.copyWith(
+                                    color: textColor,
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  'Send logs and issue details directly to engineers',
+                                  style: AppTextStyles.cardSubtitle.copyWith(
+                                    color: secondaryTextColor,
+                                    fontSize: 12.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: activeColor,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            ),
+                            onPressed: _showFeedbackModal,
+                            child: Text(
+                              'Report',
+                              style: AppTextStyles.button.copyWith(
+                                color: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
+
+                  // ── Section 3: Frequently Asked Questions ──
+                  Text(
+                    'Frequently Asked Questions',
+                    style: AppTextStyles.cardTitle.copyWith(
+                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Material(
+                    color: cardBg,
+                    borderRadius: BorderRadius.circular(16),
+                    clipBehavior: Clip.antiAlias,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: borderColor, width: 1),
+                      ),
+                      child: Column(
+                        children: List.generate(_faqs.length, (index) {
+                          final faq = _faqs[index];
+                          final isLast = index == _faqs.length - 1;
+                          return Column(
+                            children: [
+                              Theme(
+                                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                child: ExpansionTile(
+                                  iconColor: activeColor,
+                                  collapsedIconColor: secondaryTextColor,
+                                  title: Text(
+                                    faq['question']!,
+                                    style: AppTextStyles.body.copyWith(
+                                      color: textColor,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                                      child: Text(
+                                        faq['answer']!,
+                                        style: AppTextStyles.cardSubtitle.copyWith(
+                                          color: secondaryTextColor,
+                                          fontSize: 13,
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (!isLast) Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
+                            ],
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-
-            // ── Section 3: Frequently Asked Questions ──
-            Text(
-              'Frequently Asked Questions',
-              style: AppTextStyles.cardTitle.copyWith(
-                color: textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Material(
-              color: cardBg,
-              borderRadius: BorderRadius.circular(16),
-              clipBehavior: Clip.antiAlias,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderColor, width: 1),
-                ),
-                child: Column(
-                  children: List.generate(_faqs.length, (index) {
-                    final faq = _faqs[index];
-                    final isLast = index == _faqs.length - 1;
-                    return Column(
-                      children: [
-                        Theme(
-                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            iconColor: activeColor,
-                            collapsedIconColor: secondaryTextColor,
-                            title: Text(
-                              faq['question']!,
-                              style: AppTextStyles.body.copyWith(
-                                color: textColor,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                                child: Text(
-                                  faq['answer']!,
-                                  style: AppTextStyles.cardSubtitle.copyWith(
-                                    color: secondaryTextColor,
-                                    fontSize: 13,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (!isLast) Divider(height: 1, color: borderColor, indent: 16, endIndent: 16),
-                      ],
-                    );
-                  }),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-          ],
+          ),
         ),
       ),
-    ),
     );
   }
 

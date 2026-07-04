@@ -9,6 +9,7 @@ import '../../domain/entities/location_entity.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
+import 'package:field_tracker/core/widgets/app_toast.dart';
 import '../widgets/geofence_radius_slider.dart';
 import '../widgets/map_placeholder_widget.dart';
 
@@ -51,14 +52,12 @@ class _AddLocationPageState extends State<AddLocationPage> {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Location services are disabled.'),
-              action: SnackBarAction(
-                label: 'Enable',
-                onPressed: () => Geolocator.openLocationSettings(),
-              ),
-            ),
+          AppToast.show(
+            context,
+            message: 'Location services are disabled.',
+            isError: true,
+            actionLabel: 'Enable',
+            onActionPressed: () => Geolocator.openLocationSettings(),
           );
         }
         return;
@@ -71,8 +70,10 @@ class _AddLocationPageState extends State<AddLocationPage> {
 
       if (permission == LocationPermission.denied) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permission denied.')),
+          AppToast.show(
+            context,
+            message: 'Location permission denied.',
+            isError: true,
           );
         }
         return;
@@ -80,14 +81,12 @@ class _AddLocationPageState extends State<AddLocationPage> {
 
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Location permissions are permanently denied.'),
-              action: SnackBarAction(
-                label: 'Settings',
-                onPressed: () => Geolocator.openAppSettings(),
-              ),
-            ),
+          AppToast.show(
+            context,
+            message: 'Location permissions are permanently denied.',
+            isError: true,
+            actionLabel: 'Settings',
+            onActionPressed: () => Geolocator.openAppSettings(),
           );
         }
         return;
@@ -103,14 +102,17 @@ class _AddLocationPageState extends State<AddLocationPage> {
       _lngController.text = position.longitude.toStringAsFixed(4);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Current location captured!')),
+        AppToast.show(
+          context,
+          message: 'Current location captured!',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not fetch location: $e')),
+        AppToast.show(
+          context,
+          message: 'Could not fetch location: $e',
+          isError: true,
         );
       }
     } finally {
@@ -166,243 +168,245 @@ class _AddLocationPageState extends State<AddLocationPage> {
         child: BlocListener<LocationBloc, LocationState>(
         listener: (context, state) {
           if (state is LocationSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-              ),
+            AppToast.show(
+              context,
+              message: state.message,
             );
             context.pop();
           } else if (state is LocationError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.errorLight,
-              ),
+            AppToast.show(
+              context,
+              message: state.message,
+              isError: true,
             );
           }
         },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Map Preview Widget
-                MapPlaceholderWidget(radiusM: _radiusM),
-                const SizedBox(height: 16),
-                // "Use my current location" Outlined Button with dashed look
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: OutlinedButton.icon(
-                    onPressed: _isGettingLocation ? null : _fetchCurrentLocation,
-                    icon: _isGettingLocation
-                        ? SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: primaryColor,
-                            ),
-                          )
-                        : Icon(Icons.my_location, color: primaryColor, size: 20),
-                    label: Text(
-                      'Use my current location',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: primaryColor, width: 1.5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Location Name Field
-                Text(
-                  'Location name',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: labelColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _nameController,
-                  style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
-                  validator: (value) =>
-                      value == null || value.trim().isEmpty ? 'Please enter location name' : null,
-                  decoration: _inputDecoration(
-                    hintText: 'e.g. Downtown Branch',
-                    inputBg: inputBg,
-                    borderColor: borderColor,
-                    titleColor: titleColor,
-                    labelColor: labelColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Latitude & Longitude Side-by-Side
-                Row(
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 500),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Latitude',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: labelColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            controller: _latController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                              signed: true,
-                            ),
-                            style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
-                            validator: (value) =>
-                                value == null || value.trim().isEmpty ? 'Required' : null,
-                            decoration: _inputDecoration(
-                              hintText: '25.2048',
-                              inputBg: inputBg,
-                              borderColor: borderColor,
-                              titleColor: titleColor,
-                              labelColor: labelColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Longitude',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: labelColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            controller: _lngController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                              signed: true,
-                            ),
-                            style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
-                            validator: (value) =>
-                                value == null || value.trim().isEmpty ? 'Required' : null,
-                            decoration: _inputDecoration(
-                              hintText: '55.2708',
-                              inputBg: inputBg,
-                              borderColor: borderColor,
-                              titleColor: titleColor,
-                              labelColor: labelColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                // Geofence Radius Slider Section
-                GeofenceRadiusSlider(
-                  radiusM: _radiusM,
-                  onChanged: (val) {
-                    setState(() => _radiusM = val);
-                  },
-                ),
-                const SizedBox(height: 20),
-                // Active Switch Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Active',
-                          style: AppTextStyles.h4.copyWith(
-                            color: titleColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                    // Map Preview Widget
+                    MapPlaceholderWidget(radiusM: _radiusM),
+                    const SizedBox(height: 16),
+                    // "Use my current location" Outlined Button with dashed look
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        onPressed: _isGettingLocation ? null : _fetchCurrentLocation,
+                        icon: _isGettingLocation
+                            ? SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: primaryColor,
+                                ),
+                              )
+                            : Icon(Icons.my_location, color: primaryColor, size: 20),
+                        label: Text(
+                          'Use my current location',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: primaryColor,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Workers can check in here',
-                          style: AppTextStyles.bodySmall.copyWith(color: labelColor),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: primaryColor, width: 1.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Location Name Field
+                    Text(
+                      'Location name',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: labelColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameController,
+                      style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty ? 'Please enter location name' : null,
+                      decoration: _inputDecoration(
+                        hintText: 'e.g. Downtown Branch',
+                        inputBg: inputBg,
+                        borderColor: borderColor,
+                        titleColor: titleColor,
+                        labelColor: labelColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Latitude & Longitude Side-by-Side
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Latitude',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: labelColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: _latController,
+                                keyboardType: const TextInputType.numberWithOptions(
+                                  decimal: true,
+                                  signed: true,
+                                ),
+                                style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty ? 'Required' : null,
+                                decoration: _inputDecoration(
+                                  hintText: '25.2048',
+                                  inputBg: inputBg,
+                                  borderColor: borderColor,
+                                  titleColor: titleColor,
+                                  labelColor: labelColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Longitude',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: labelColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: _lngController,
+                                keyboardType: const TextInputType.numberWithOptions(
+                                  decimal: true,
+                                  signed: true,
+                                ),
+                                style: AppTextStyles.bodyMedium.copyWith(color: titleColor),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty ? 'Required' : null,
+                                decoration: _inputDecoration(
+                                  hintText: '55.2708',
+                                  inputBg: inputBg,
+                                  borderColor: borderColor,
+                                  titleColor: titleColor,
+                                  labelColor: labelColor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    Switch(
-                      value: _isActive,
-                      activeThumbColor: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
-                      activeTrackColor: primaryColor,
+                    const SizedBox(height: 24),
+                    // Geofence Radius Slider Section
+                    GeofenceRadiusSlider(
+                      radiusM: _radiusM,
                       onChanged: (val) {
-                        setState(() => _isActive = val);
+                        setState(() => _radiusM = val);
                       },
                     ),
+                    const SizedBox(height: 20),
+                    // Active Switch Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Active',
+                              style: AppTextStyles.h4.copyWith(
+                                color: titleColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Workers can check in here',
+                              style: AppTextStyles.bodySmall.copyWith(color: labelColor),
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          value: _isActive,
+                          activeThumbColor: isDark ? AppColors.onPrimaryDark : AppColors.onPrimaryLight,
+                          activeTrackColor: primaryColor,
+                          onChanged: (val) {
+                            setState(() => _isActive = val);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    // Save Location Button
+                    BlocBuilder<LocationBloc, LocationState>(
+                      builder: (context, state) {
+                        final isSubmitting = state is LocationSubmitting;
+
+                        return SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: isSubmitting ? null : _onSaveLocation,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14.0),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: isSubmitting
+                                ? SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: isDark
+                                          ? AppColors.onPrimaryDark
+                                          : AppColors.onPrimaryLight,
+                                    ),
+                                  )
+                                : Text(
+                                    'Save location',
+                                    style: AppTextStyles.button.copyWith(
+                                      color: isDark
+                                          ? AppColors.onPrimaryDark
+                                          : AppColors.onPrimaryLight,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
-                const SizedBox(height: 32),
-                // Save Location Button
-                BlocBuilder<LocationBloc, LocationState>(
-                  builder: (context, state) {
-                    final isSubmitting = state is LocationSubmitting;
-
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: isSubmitting ? null : _onSaveLocation,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.0),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: isSubmitting
-                            ? SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: isDark
-                                      ? AppColors.onPrimaryDark
-                                      : AppColors.onPrimaryLight,
-                                ),
-                              )
-                            : Text(
-                                'Save location',
-                                style: AppTextStyles.button.copyWith(
-                                  color: isDark
-                                      ? AppColors.onPrimaryDark
-                                      : AppColors.onPrimaryLight,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
           ),
         ),

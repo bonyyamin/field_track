@@ -7,6 +7,8 @@ import 'package:field_tracker/core/widgets/error_view.dart';
 import 'package:field_tracker/core/widgets/loading_indicator.dart';
 import 'package:field_tracker/core/widgets/offline_banner.dart';
 
+import 'package:field_tracker/core/widgets/app_toast.dart';
+
 import '../bloc/todo_bloc.dart';
 import '../bloc/todo_event.dart';
 import '../bloc/todo_state.dart';
@@ -48,84 +50,88 @@ class _TodoListPageState extends State<TodoListPage> {
     return Scaffold(
       backgroundColor: scaffoldBg,
       body: SafeArea(
-        child: BlocConsumer<TodoBloc, TodoState>(
-          listener: (context, state) {
-            if (state is TodoErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: isDark ? AppColors.errorDark : AppColors.errorLight,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            final bloc = context.read<TodoBloc>();
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: BlocConsumer<TodoBloc, TodoState>(
+              listener: (context, state) {
+                if (state is TodoErrorState) {
+                  AppToast.show(
+                    context,
+                    message: state.message,
+                    isError: true,
+                  );
+                }
+              },
+              builder: (context, state) {
+                final bloc = context.read<TodoBloc>();
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Page Header ("My tasks" + Date)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Page Header ("My tasks" + Date)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            'My tasks',
-                            style: AppTextStyles.headingMedium.copyWith(
-                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 24,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'My tasks',
+                                style: AppTextStyles.headingMedium.copyWith(
+                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 24,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _formatHeaderDate(),
+                                style: AppTextStyles.subtitle.copyWith(
+                                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _formatHeaderDate(),
-                            style: AppTextStyles.subtitle.copyWith(
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          if (state is TodoLoadedState) ...[
+                            IconButton(
+                              icon: state.isSyncing
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      AppIcon.syncInactive,
+                                      color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                              onPressed: state.isSyncing
+                                  ? null
+                                  : () => bloc.add(const SyncPendingTodosEvent()),
+                              tooltip: 'Sync pending changes',
                             ),
-                          ),
+                          ],
                         ],
                       ),
-                      if (state is TodoLoadedState) ...[
-                        IconButton(
-                          icon: state.isSyncing
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-                                  ),
-                                )
-                              : Image.asset(
-                                  AppIcon.syncInactive,
-                                  color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-                                  width: 24,
-                                  height: 24,
-                                ),
-                          onPressed: state.isSyncing
-                              ? null
-                              : () => bloc.add(const SyncPendingTodosEvent()),
-                          tooltip: 'Sync pending changes',
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+                    ),
 
-                // Main Content Body
-                Expanded(
-                  child: _buildBody(context, state, bloc),
-                ),
-              ],
-            );
-          },
+                    // Main Content Body
+                    Expanded(
+                      child: _buildBody(context, state, bloc),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
